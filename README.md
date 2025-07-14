@@ -1,7 +1,7 @@
 
 ![image](PLACEHOLDER FOR COVER IMAGE)
 
-# 🎥 Dahua Camera/CCTV System in Home Assistant
+# 🎥 Dahua Camera/CCTV System in Home Assistant (🚧UNDER CONSTRUCTION🚧)
 _Getting Dahua NVRs and cameras into Home Assistant with actionable smart events.  
 Integration walkthrough with go2rtc, smart motion detection, light automations, RTSP streaming setup, and best-practice camera configs._
 
