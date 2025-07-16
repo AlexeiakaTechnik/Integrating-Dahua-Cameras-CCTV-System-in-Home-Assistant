@@ -87,13 +87,13 @@ Dahua is one of the most widely used CCTV brands worldwide, known for offering a
 
 ### 🧩 Ecosystem Breakdown
 - Dahua NVRs are designed to work best with Dahua-brand cameras, but **ONVIF-compatible** models from other brands (e.g., Reolink, Hikvision) may work with limited features.
-- **Smart Detection Events** (IVS) are often processed on-camera, with the NVR aggregating or forwarding them to third-party systems like Home Assistant.
-- Most Dahua cameras support **RTSP streaming**, which is critical for integrating with HA dashboards and go2rtc.
+- **Smart Detection Events** (IVS) are often processed on-camera, with the NVR aggregating or forwarding them to third-party systems, like Home Assistant.
+- Most Dahua cameras support **RTSP streaming**, which is very useful for integrating with HA dashboards and go2rtc to achieve the best performance results.
 
 ### ⚠️ Integration Limitations
 While Dahua hardware is solid, integration into Home Assistant comes with some constraints:
 - The **official Dahua HA integration** supports only **basic smart events** (motion, IVS tripwire, tamper). Advanced analytics (e.g., facial detection, people counting) are **not exposed** via the current API.
-- **Two-way audio and PTZ control** is very limited or not available through Home Assistant.
+- **Two-way audio and PTZ control** is very limited or not available through Home Assistant, more on that later.
 - Camera settings must still be configured through the **web interface or Dahua ConfigTool**.
 - No official or clean MQTT support.
 
@@ -108,27 +108,66 @@ If you're building a new system:
 - Optionally, cameras can **send snapshots via FTP to NAS or external storage** on motion.
 - Unlike cloud-based brands (e.g., Eufy, Arlo), Dahua systems allow **fully local operation**, which is ideal for privacy-conscious users.
 
-![image](PLACEHOLDER FOR IMAGES OF: CCTV SYSTEMS GUIDELINES, DAHUA CAMS)
+In comparison with other known brands, like Hikvision, Dahua offers pretty much the same capabilities, depending on the exact model lines. Here is an example of comparison Hikvision vs Dahua vs Tiandy(another Chinese brand).
+
+<details>
+<summary>📸 Camera Comparison (Click to Expand)</summary>
+
+<img width="1080" height="1135" alt="image" src="https://github.com/user-attachments/assets/ecf4e5db-5186-4be9-bda4-e833d15f5d54" />
+
+</details>
 
 
 ---
 
 ## 🛠️ 4. Cameras Installation Tips and Web-based Setup [↑](#-table-of-contents)
 
+Setting up CCTV cameras isn't just about plugging them in. The physical mounting, angle, network planning, and web-based configuration all impact reliability, detection accuracy, and automation success.
+
 ### 📍 Physical Installation Tips
-- Avoid glare, rain, and overexposure
-- Secure cable management and weatherproofing
-- Mounting height recommendations and blind spot avoidance
+
+- **Mounting height:** For human detection, 2.5–3 meters is ideal. Too high and you miss faces/details, too low and you decrese field of view and invite tampering.
+- **Avoid glare:** Don’t point cameras directly at light sources (sun!, lamps, or car headlights). Use **turret-style cams** outdoors to reduce IR reflection.
+- **Shelter from weather:** Even IP67-rated cams benefit from small roof covers. It protects lenses from raindrops and maintains clean image quality. While installing, make sure to use additional compatible camera mounts(IP67). They are sold separately. 
+- **Cable management:** Always use weatherproof boxes or grommets for cable exits. Very important advice - do not neglect RJ45 waterproof connector caps, even if you are sure there is no water getting near the camera! One unfortunate rain/thunderstorm/flood and POE can short. For long-term durability, run PoE via proper CAT5e/6 cabling inside walls or conduit.
+- **No blind spots:** Review camera fields of view in real time during installation. Avoid overly wide angles where humans become tiny blobs.
+- Do not neglect **personal safety** on ladders/hights! Make sure someone is available to help you. 
+
+Here is a short video of one of my cams, just to demonstrate how it's mounted:
+
+!VIDEO CAMERA MOUNT
+
+> 🛠️ _Pro tip:_ Use your phone and a PoE tester or temporary injector to preview the stream live while adjusting position.
+
+---
 
 ### 🌐 Web-Based Configuration
-- Dahua’s IP config tool or direct access via IP
-- Time sync issues & fixes
-- RTSP, ONVIF setup
-- User permissions
-- Port layout explanation (HTTP, RTSP, etc.)
+
+Each Dahua camera has a built-in web UI, accessible via IP address. This is where most critical config is done before HA integration.
+
+- **Initial IP Setup:**  
+  Use Dahua’s [ConfigTool](https://www.dahuasecurity.com/support/downloadCenter) to scan and assign IP addresses, or access directly if your router lists new devices. I prefer doing it via WEB-UI, as long as cam gets IP from DHCP(enabled on default). Also, important thing - make sure to assign Static IPv4 to your cameras and NVR(s) or static DHCP binds in your router/dhcp server configs and in cam WEB-UI/Dahua tool - HA integration will use one IP to get data from Dahua device and we would not want it to change.
+  
+- **Time Sync:**  
+  Enable NTP and sync with your Home Assistant device or local NTP server. Time mismatch causes major issues in event automation and recordings.
+
+- **Stream Setup (RTSP):**  
+  Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264.
+
+- **User Management:**  
+  Create a dedicated `homeassistant` user with only the needed permissions. Avoid using admin credentials for automation integrations.
+
+- **Port Layout (defaults):**  
+  - Web UI: `HTTP 80` / `HTTPS 443`  
+  - RTSP: `554`  
+  - ONVIF: `8999` or `80`  
+  - ConfigTool often uses port `37020` for discovery
+  
+> 🔐 _Security Tip:_ Disable UPnP on your router and change default Dahua passwords immediately.
+
+---
 
 ![image](PLACEHOLDER FOR PHOTOS OF INSTALLATION, RACK, POE BOX, SCREENSHOTS FROM DAHUA GUI)
-
 ---
 
 ## 🏠 5. Integrating with Home Assistant [↑](#-table-of-contents)
