@@ -1,5 +1,6 @@
 
-![image](PLACEHOLDER FOR COVER IMAGE)
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/a789fb5c-b4d1-4430-99a1-ca86ca08a189" />
+
 
 # 🎥 Dahua Camera/CCTV System in Home Assistant (🚧UNDER CONSTRUCTION🚧)
 _Getting Dahua NVRs and cameras into Home Assistant with actionable smart events.  
@@ -28,7 +29,17 @@ Integration walkthrough with go2rtc, smart motion detection, light automations, 
 
 ## 🔍 1. Introduction [↑](#-table-of-contents)
 
-_Brief overview of the idea, motivation, and practical benefit of integrating Dahua CCTV systems with Home Assistant. Discusses desire for unified control, privacy, event-driven automation, and ditching closed ecosystems._
+Modern CCTV systems often come with their own closed ecosystems, mobile apps, and cloud dependencies. While this works for average users, advanced users (us with HA) and integrators increasingly seek **local control**, **event-based automations**, and **unified dashboards**.
+
+This article documents my hands-on experience integrating a **Dahua NVR and multiple IP cameras** into **Home Assistant**, using tools like `go2rtc` for RTSP stream handling and the official Dahua integration for **smart event-based triggers**.
+
+The goal was simple:  
+- **Stream all cameras reliably inside Home Assistant**,  
+- **Use Dahua's advanced detection events (tripwires, IVS)** as triggers,  
+- **Avoid cloud lock-in**,  
+- And **make security visuals and controls available on wall-mounted tablets and mobile phones.**
+
+If you're looking for a **stable, private, and responsive** way to bring your CCTV system into your smart home, this guide covers the full pipeline: from camera installation and Dahua setup to smart lighting automations, dashboards, and UI best practices.
 
 ---
 
