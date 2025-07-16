@@ -133,6 +133,8 @@ Setting up CCTV cameras isn't just about plugging them in. The physical mounting
 - **No blind spots:** Review camera fields of view in real time during installation. Avoid overly wide angles where humans become tiny blobs.
 - Do not neglect **personal safety** on ladders/hights! Make sure someone is available to help you. 
 
+> 🛠️ _Pro tip:_ Use your phone and a PoE tester or temporary injector to preview the stream live while adjusting position.
+
 Here is a **short video of one of my cams**, just to demonstrate how it's mounted and provide some visual tips:
 
 <details>
@@ -142,12 +144,10 @@ Here is a **short video of one of my cams**, just to demonstrate how it's mounte
 
 </details>
 
-> 🛠️ _Pro tip:_ Use your phone and a PoE tester or temporary injector to preview the stream live while adjusting position.
-
 Another **video** **-** **overview of NVR, POE Switch, network and Security Monitoring Station** setup:
 
 <details>
-<summary>🎬 Camera Mount (Click to Expand)</summary>
+<summary>🎬 My Dahua Setup (Click to Expand)</summary>
 
 [![HA - AJAX Demonstration](https://img.youtube.com/vi/ba6nMvc4q2w/0.jpg)](https://www.youtube.com/watch?v=ba6nMvc4q2w)
 
