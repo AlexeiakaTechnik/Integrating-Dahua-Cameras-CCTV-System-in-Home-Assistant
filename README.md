@@ -135,7 +135,13 @@ Setting up CCTV cameras isn't just about plugging them in. The physical mounting
 
 Here is a short video of one of my cams, just to demonstrate how it's mounted:
 
-!VIDEO CAMERA MOUNT
+<details>
+<summary>🎬 Camera Mount (Click to Expand)</summary>
+
+YouTube Video
+[![HA - AJAX Demonstration](https://img.youtube.com/vi/RLNLpIZlIpg/0.jpg)](https://www.youtube.com/watch?v=RLNLpIZlIpg)
+
+</details>
 
 > 🛠️ _Pro tip:_ Use your phone and a PoE tester or temporary injector to preview the stream live while adjusting position.
 
