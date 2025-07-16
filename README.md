@@ -45,14 +45,31 @@ If you're looking for a **stable, private, and responsive** way to bring your CC
 
 ## 🧰 2. Requirements [↑](#-table-of-contents)
 
-- **Home Assistant OS** (or Supervised / Docker setups)
-- **Dahua NVR with Smart Motion Support**  
-  _(Model used: INSERT MODEL HERE)_
-- **Dahua IP Cameras**  
-  _(Models used: INSERT MODELS HERE)_
-- **POE Switch** for powering and connecting cams
-- **LAN/WAN Configuration** – no need to expose ports externally
-- **Sufficient storage** (based on bitrate, # of cams, retention period)
+Before starting the integration, make sure you have the following or equal components in place.
+
+### 🖥️ Core Software
+- **Home Assistant OS**  
+  _Also compatible with Supervised and Docker-based installs_
+- **HACS (Home Assistant Community Store)** – we will install it later
+- **go2rtc Add-on** – will install later
+
+### 📸 CCTV Hardware
+- **Dahua NVR** with Smart Motion/IVS Event Support  
+  _Model used by me: `DHI-NVR2108HS-I`_
+- **Dahua IP Cameras** with Tripwire / IVS Support / SmartMotion 
+  _Models used by me: `DH-IPC-HFW3441E-SA`_
+
+### 🌐 Network and Power
+- **PoE Switch** (Power over Ethernet)  
+  _Used to power and connect all cameras directly_
+- **Structured LAN/WAN Setup**  
+  _Router with internal-only access to NVR/cams; no port forwarding required, unless you want to use Dahua App in WAN_
+
+### 💾 Storage & Performance
+- **Sufficient NVR Storage Capacity**  
+  _Depends on: camera resolution, bitrate, retention duration, 2-4Tb is usually enogh_
+- **Decent HA hardware**  
+  _Raspberry Pi 4 is a minimal baseline. More cams = better CPU and storage. Also dashboard tablets/phones should have decent performance to quickly load multiple streams_
 
 ---
 
@@ -63,6 +80,36 @@ Comparison to Reolink, Hikvision, etc.
 Discuss storage logic: NVR storage vs. motion-triggered FTP/NAS/cloud.
 
 ![image](PLACEHOLDER FOR IMAGES OF: CCTV SYSTEMS GUIDELINES, DAHUA CAMS)
+
+Dahua is one of the most widely used CCTV brands worldwide, known for offering a good balance between price, performance, and professional features. Their lineup includes:
+- **NVRs** (Network Video Recorders) that centralize recording and event processing
+- **IP cameras** that support ONVIF, RTSP, and in many cases, **smart detection events** like tripwire crossing, intrusion zones, and face detection
+
+### 🧩 Ecosystem Breakdown
+- Dahua NVRs are designed to work best with Dahua-brand cameras, but **ONVIF-compatible** models from other brands (e.g., Reolink, Hikvision) may work with limited features.
+- **Smart Detection Events** (IVS) are often processed on-camera, with the NVR aggregating or forwarding them to third-party systems like Home Assistant.
+- Most Dahua cameras support **RTSP streaming**, which is critical for integrating with HA dashboards and go2rtc.
+
+### ⚠️ Integration Limitations
+While Dahua hardware is solid, integration into Home Assistant comes with some constraints:
+- The **official Dahua HA integration** supports only **basic smart events** (motion, IVS tripwire, tamper). Advanced analytics (e.g., facial detection, people counting) are **not exposed** via the current API.
+- **Two-way audio and PTZ control** is very limited or not available through Home Assistant.
+- Camera settings must still be configured through the **web interface or Dahua ConfigTool**.
+- No official or clean MQTT support.
+
+### 🛒 Advice for New Buyers
+If you're building a new system:
+- Choose cameras that support **IVS events (tripwire, intrusion zones)** — these work well in HA.
+- Stick to **fixed lens models** unless you specifically need motorized zoom or PTZ.
+- Consider using **turret-style cameras** outdoors — less glare and IR bleeding compared to domes.
+
+### 📦 Local vs. Cloud Storage
+- Dahua NVRs store footage locally on internal HDDs.
+- Optionally, cameras can **send snapshots via FTP to NAS or external storage** on motion.
+- Unlike cloud-based brands (e.g., Eufy, Arlo), Dahua systems allow **fully local operation**, which is ideal for privacy-conscious users.
+
+![image](PLACEHOLDER FOR IMAGES OF: CCTV SYSTEMS GUIDELINES, DAHUA CAMS)
+
 
 ---
 
