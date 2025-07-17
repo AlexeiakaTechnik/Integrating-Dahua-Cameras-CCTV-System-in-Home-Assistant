@@ -105,7 +105,7 @@ If you're building a new system:
 In comparison with other known brands, like Hikvision, Dahua offers pretty much the same capabilities, depending on the exact model lines. Here is an example of comparison Hikvision vs Dahua vs Tiandy(another Chinese brand).
 
 <details>
-<summary>📸 **Camera Comparison** (Click to Expand)</summary>
+<summary>📸 Camera Comparison (Click to Expand)</summary>
 
 <img width="1080" height="1135" alt="image" src="https://github.com/user-attachments/assets/ecf4e5db-5186-4be9-bda4-e833d15f5d54" />
 
@@ -141,7 +141,7 @@ Here is a **short video of one of my cams**, just to demonstrate how it's mounte
 Another **video** **-** **overview of NVR, POE Switch, network and Security Monitoring Station** setup:
 
 <details>
-<summary>🎬 **My Dahua Setup** (Click to Expand)</summary>
+<summary>🎬 My Dahua Setup (Click to Expand)</summary>
 
 [![HA - AJAX Demonstration](https://img.youtube.com/vi/ba6nMvc4q2w/0.jpg)](https://www.youtube.com/watch?v=ba6nMvc4q2w)
 
@@ -157,18 +157,34 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
   Use Dahua’s [ConfigTool](https://www.dahuasecurity.com/support/downloadCenter) to scan and assign IP addresses, or access directly if your router lists new devices. I prefer doing it via WEB-UI, as long as cam gets IP from DHCP(enabled on default). Also, important thing - make sure to assign Static IPv4 to your cameras and NVR(s) or static DHCP binds in your router/dhcp server configs and in cam WEB-UI/Dahua tool - HA integration will use one IP to get data from Dahua device and we would not want it to change.
 
 <details>
-<summary>📸 **IP Config** (Click to Expand)</summary>
+<summary>📸 IP Config (Click to Expand)</summary>
 
 <img width="1643" height="679" alt="image" src="https://github.com/user-attachments/assets/75ef5e8d-88ac-44e6-bf71-8d486d1b3ddc" />
 
 </details> 
+
+> 🔐 _Security Tip:_ Disable UPnP on your router and change default Dahua passwords immediately.
+
+- **Port Layout (defaults):**  
+  - Web UI: `HTTP 80` / `HTTPS 443`
+  - RTSP: `554` - change if you need
+  - ONVIF - uses HTTP/HTTPS for communication: usually `8080` or `80`  or `443`
+  - TCP/UDP: `37777`/`37778` - to communicate with NVR, Apps, etc., - network ports. ConfigTool often uses port `37020` for discovery.
+  - Max Connection `10` (1~20) - can be used as an additional security layer if you are sure how many max connections(Live views, for example) can happen at a time
+
+<details>
+<summary>📸 Ports Config (Click to Expand)</summary>
+
+<img width="1618" height="697" alt="image" src="https://github.com/user-attachments/assets/efbbe5a6-ef65-4cb8-a378-f2e6468ebf4d" />
+
+</details>
 
 - **Time Sync:**  
   Somehow, Dahua still has well-known issues with Time. Enabling NTP and syncing with your PC didn't work for me most times(my home lab + a few commercial installs). What I really recommend is choosing your Time Zone and setting up DST(Daylight Saving Time) if it happens in your region. Still, after that your Time Zone may be 1 hour ahead of real clock.. so try picking similar time zones and eventually you will set up normal time. Oh, and it's best to set up settings propagation from NVR to IP Cams for convenience and ease of set-up, just make sure you configure static IPs first.
 
 Here are a few screenshots of System/Time WEB Config:
 <details>
-<summary>📸 **System Config Propagation - on NVRs web-page**(Click to Expand)</summary>
+<summary>📸 System Config Propagation - on NVRs web-page(Click to Expand)</summary>
 
 <img width="1310" height="777" alt="image" src="https://github.com/user-attachments/assets/ca31568e-4370-45e8-b076-246054c1e1dc" />
 
@@ -186,7 +202,7 @@ Here are a few screenshots of System/Time WEB Config:
 IP Cameras usually have a few stream channels - Main Stream for high-qulity recordings, saved to HDD/NAS/Cloud and Sub Streams for Live Views(Mobile App, 3rd Party Services(Home Assistant), RTSP Web streams, etc.) Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264. 
 
 <details>
-<summary>📸 **My Stream Config** (Click to Expand)</summary>
+<summary>📸 My Stream Config (Click to Expand)</summary>
 
 <img width="1752" height="724" alt="image" src="https://github.com/user-attachments/assets/49e2f215-72a6-46bc-867b-2b4427dfe189" />
 
@@ -209,7 +225,7 @@ What is important is to understand URL Link structure for Dahua Cams/NVRs. Those
  - **Regarding **ONVIF**(_Open Network Video Interface Forum_)** - it allows devices from different manufacturers to work together seamlessly, even if they don't have native compatibility. It also includes features like device discovery, configuration, user management, events, and PTZ (pan-tilt-zoom) control. And allows for it's own **network discovery** - this will become usefull later when we configure go2rtc Add-on for HA, so I recommend enabling it.
 
 <details>
-<summary>📸 **ONVIF Config** (Click to Expand)</summary>
+<summary>📸 ONVIF Config (Click to Expand)</summary>
 
 <img width="1626" height="649" alt="image" src="https://github.com/user-attachments/assets/46d87547-33f8-4a41-9f14-12148b5c2965" />
 
@@ -221,31 +237,30 @@ What is important is to understand URL Link structure for Dahua Cams/NVRs. Those
   Example:
 
 <details>
-<summary>📸 **Add user** (Click to Expand)</summary>
+<summary>📸 Add user (Click to Expand)</summary>
 
 <img width="1605" height="712" alt="image" src="https://github.com/user-attachments/assets/b85ead90-bcc4-4571-979d-bb8de4436da5" />
 
 </details>
 
 
-- **Port Layout (defaults):**  
-  - Web UI: `HTTP 80` / `HTTPS 443`  
-  - RTSP: `554`  
-  - ONVIF: `8999` or `80`  
-  - ConfigTool often uses port `37020` for discovery
-  Max Connection 10 (1~20)
-TCP Port: 37777 (1025~65534)
-UDP Port
-37778
- (1025~65534)
-HTTP Port
-80
-RTSP Port
-554
-HTTPS Port
-443
+This covers basic configs to manage Camera, get Live RTSP Stream from it, and discover them via ONVIF. But we need the events themselves to bind Home Assistant Automations to. In order to do this let's make sure Event(s) are configured correctly on the Camera(s)
 
-> 🔐 _Security Tip:_ Disable UPnP on your router and change default Dahua passwords immediately.
+- **Events:** [↑](#-table-of-contents)
+  To cover all bases, I have **Video Detection**(Only Motion Detection), **Smart Motion Detection**(Recognizes Human/Vehicle silhouette), **Audio Detection**(Abnormality threshold based), **Smart Detection**(IVS plan), and **Abnormality Detection**(Network disconnect, Access violation, and Voltage shifts) enabled. Let's cover them one by one:
+
+    - **Video Detection**(Motion Detection) - uses generic algorithm and sensetivity threshold to compare frames and trigger Event. See Screenshot for configuration.
+<details>
+<summary>📸 Video Detection Tab (Click to Expand)</summary>
+
+<img width="1665" height="826" alt="image" src="https://github.com/user-attachments/assets/53f87545-f60c-4383-9c2e-f70828b2844e" />
+
+</details>
+    - *
+
+
+
+
 
 ---
 
