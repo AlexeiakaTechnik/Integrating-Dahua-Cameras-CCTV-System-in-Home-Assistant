@@ -45,7 +45,7 @@ If you're looking for a **stable, private, and responsive** way to bring your CC
 
 ## 🧰 2. Requirements [↑](#-table-of-contents)
 
-Before starting the integration, make sure you have the following or equal components in place.
+Before starting the integration, make sure you have the following or equivalent components in place.
 
 ### 🖥️ Core Software
 - **Home Assistant OS**  
@@ -74,12 +74,6 @@ Before starting the integration, make sure you have the following or equal compo
 ---
 
 ## 🧱 3. Dahua Cameras Overview & Integration Limitations [↑](#-table-of-contents)
-
-_Explanation of the Dahua ecosystem: NVR vs. standalone cams, ONVIF/RTSP support, smart events, and limitations. Tips for buyers looking to install CCTV systems._  
-Comparison to Reolink, Hikvision, etc.  
-Discuss storage logic: NVR storage vs. motion-triggered FTP/NAS/cloud.
-
-![image](PLACEHOLDER FOR IMAGES OF: CCTV SYSTEMS GUIDELINES, DAHUA CAMS)
 
 Dahua is one of the most widely used CCTV brands worldwide, known for offering a good balance between price, performance, and professional features. Their lineup includes:
 - **NVRs** (Network Video Recorders) that centralize recording and event processing
@@ -111,7 +105,7 @@ If you're building a new system:
 In comparison with other known brands, like Hikvision, Dahua offers pretty much the same capabilities, depending on the exact model lines. Here is an example of comparison Hikvision vs Dahua vs Tiandy(another Chinese brand).
 
 <details>
-<summary>📸 Camera Comparison (Click to Expand)</summary>
+<summary>📸 **Camera Comparison** (Click to Expand)</summary>
 
 <img width="1080" height="1135" alt="image" src="https://github.com/user-attachments/assets/ecf4e5db-5186-4be9-bda4-e833d15f5d54" />
 
@@ -138,7 +132,7 @@ Setting up CCTV cameras isn't just about plugging them in. The physical mounting
 Here is a **short video of one of my cams**, just to demonstrate how it's mounted and provide some visual tips:
 
 <details>
-<summary>🎬 Camera Mount (Click to Expand)</summary>
+<summary>🎬 **Camera Mount** (Click to Expand)</summary>
 
 [![HA - AJAX Demonstration](https://img.youtube.com/vi/RLNLpIZlIpg/0.jpg)](https://www.youtube.com/watch?v=RLNLpIZlIpg)
 
@@ -147,7 +141,7 @@ Here is a **short video of one of my cams**, just to demonstrate how it's mounte
 Another **video** **-** **overview of NVR, POE Switch, network and Security Monitoring Station** setup:
 
 <details>
-<summary>🎬 My Dahua Setup (Click to Expand)</summary>
+<summary>🎬 **My Dahua Setup** (Click to Expand)</summary>
 
 [![HA - AJAX Demonstration](https://img.youtube.com/vi/ba6nMvc4q2w/0.jpg)](https://www.youtube.com/watch?v=ba6nMvc4q2w)
 
@@ -161,30 +155,38 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
 
 - **Initial IP Setup:**  
   Use Dahua’s [ConfigTool](https://www.dahuasecurity.com/support/downloadCenter) to scan and assign IP addresses, or access directly if your router lists new devices. I prefer doing it via WEB-UI, as long as cam gets IP from DHCP(enabled on default). Also, important thing - make sure to assign Static IPv4 to your cameras and NVR(s) or static DHCP binds in your router/dhcp server configs and in cam WEB-UI/Dahua tool - HA integration will use one IP to get data from Dahua device and we would not want it to change.
-  
+
+<details>
+<summary>📸 **IP Config** (Click to Expand)</summary>
+
+<img width="1643" height="679" alt="image" src="https://github.com/user-attachments/assets/75ef5e8d-88ac-44e6-bf71-8d486d1b3ddc" />
+
+</details> 
+
 - **Time Sync:**  
   Somehow, Dahua still has well-known issues with Time. Enabling NTP and syncing with your PC didn't work for me most times(my home lab + a few commercial installs). What I really recommend is choosing your Time Zone and setting up DST(Daylight Saving Time) if it happens in your region. Still, after that your Time Zone may be 1 hour ahead of real clock.. so try picking similar time zones and eventually you will set up normal time. Oh, and it's best to set up settings propagation from NVR to IP Cams for convenience and ease of set-up, just make sure you configure static IPs first.
 
 Here are a few screenshots of System/Time WEB Config:
 <details>
-<summary>📸 System Config Propagation (Click to Expand)</summary>
+<summary>📸 **System Config Propagation - on NVRs web-page**(Click to Expand)</summary>
 
 <img width="1310" height="777" alt="image" src="https://github.com/user-attachments/assets/ca31568e-4370-45e8-b076-246054c1e1dc" />
 
 </details> 
 
 <details>
-<summary>📸 Time Settings (Click to Expand)</summary>
+<summary>📸 **Time Settings** (Click to Expand)</summary>
 
 <img width="1220" height="877" alt="image" src="https://github.com/user-attachments/assets/9ae990e5-db76-4180-b0a6-f7804879052b" />
 
 </details>
 
 - **Stream Setup (RTSP):** [↑](#-table-of-contents)
-  IP Cameras usually have a few stream channels - Main Stream for high-qulity recordings, saved to HDD/NAS/Cloud and Sub Streams for Live Views(Mobile App, 3rd Party Services(Home Assistant), RTSP Web streams, etc.) Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264. 
+
+IP Cameras usually have a few stream channels - Main Stream for high-qulity recordings, saved to HDD/NAS/Cloud and Sub Streams for Live Views(Mobile App, 3rd Party Services(Home Assistant), RTSP Web streams, etc.) Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264. 
 
 <details>
-<summary>📸 My Stream Config (Click to Expand)</summary>
+<summary>📸 **My Stream Config** (Click to Expand)</summary>
 
 <img width="1752" height="724" alt="image" src="https://github.com/user-attachments/assets/49e2f215-72a6-46bc-867b-2b4427dfe189" />
 
@@ -198,31 +200,51 @@ What is important is to understand URL Link structure for Dahua Cams/NVRs. Those
     rtsp://USERNAME:PASSWORD@CAMERA_IP:554/cam/realmonitor?channel=1&subtype=0
       ```
     Where:
-    - USERNAME and PASSWORD are the credentials set up on cam web interface(or propagated from NVR), 
-    - IP is cam's IPv4 address
-    - Port is 554 by default
-    - channel=1 — first camera input (for NVRs or standalone cam)
-    - subtype=1 — sub stream (low-res, low bitrate), subtype=0 is usually Main Stream just FYI
+    - `USERNAME` and `PASSWORD` are the credentials set up on cam web interface(or propagated from NVR), 
+    - `CAMERA_IP` is cam's IPv4/IPv6 address
+    - `554` Port is 554 by default
+    - `channel=1` — first camera input (for NVRs or standalone cam)
+    - `subtype=1` — sub stream (low-res, low bitrate), subtype=0 is usually Main Stream just FYI
 
  - **Regarding **ONVIF**(_Open Network Video Interface Forum_)** - it allows devices from different manufacturers to work together seamlessly, even if they don't have native compatibility. It also includes features like device discovery, configuration, user management, events, and PTZ (pan-tilt-zoom) control. And allows for it's own **network discovery** - this will become usefull later when we configure go2rtc Add-on for HA, so I recommend enabling it.
 
 <details>
-<summary>📸 ONVIF Config (Click to Expand)</summary>
+<summary>📸 **ONVIF Config** (Click to Expand)</summary>
 
 <img width="1626" height="649" alt="image" src="https://github.com/user-attachments/assets/46d87547-33f8-4a41-9f14-12148b5c2965" />
 
 </details>
 
 
-- **User Management:** 
-  Create a dedicated `homeassistant` user with only the needed permissions. Avoid using admin credentials for automation integrations.
+- **User Management:** [↑](#-table-of-contents)
+  Create a dedicated `homeassistant` user with only the needed permissions(live is enough). Avoid using admin credentials for automation integrations. Make sure to write down username and password - those are used to access RTSP link.
+  Example:
+
+<details>
+<summary>📸 **Add user** (Click to Expand)</summary>
+
+<img width="1605" height="712" alt="image" src="https://github.com/user-attachments/assets/b85ead90-bcc4-4571-979d-bb8de4436da5" />
+
+</details>
+
 
 - **Port Layout (defaults):**  
   - Web UI: `HTTP 80` / `HTTPS 443`  
   - RTSP: `554`  
   - ONVIF: `8999` or `80`  
   - ConfigTool often uses port `37020` for discovery
-  
+  Max Connection 10 (1~20)
+TCP Port: 37777 (1025~65534)
+UDP Port
+37778
+ (1025~65534)
+HTTP Port
+80
+RTSP Port
+554
+HTTPS Port
+443
+
 > 🔐 _Security Tip:_ Disable UPnP on your router and change default Dahua passwords immediately.
 
 ---
