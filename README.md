@@ -166,10 +166,10 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
   - ONVIF - uses HTTP/HTTPS for communication: usually `8080` or `80`  or `443`
   - TCP/UDP: `37777`/`37778` - to communicate with NVR, Apps, etc., - network ports. ConfigTool often uses port `37020` for discovery.
   - Max Connection `10` (1~20) - can be used as an additional security layer if you are sure how many max connections(Live views, for example) can happen at a time
-    <details>
+  <details>
                                                                   <summary>📸 Ports Config (Click to Expand)</summary>
 
-      <img width="1618" height="697" alt="image" src="https://github.com/user-attachments/assets/efbbe5a6-ef65-4cb8-a378-f2e6468ebf4d" /> </details>
+  <img width="1618" height="697" alt="image" src="https://github.com/user-attachments/assets/efbbe5a6-ef65-4cb8-a378-f2e6468ebf4d" /> </details>
 
 - **Time Sync:**  
   Somehow, Dahua still has well-known issues with Time. Enabling NTP and syncing with your PC didn't work for me most times(my home lab + a few commercial installs). What I really recommend is choosing your Time Zone and setting up DST(Daylight Saving Time) if it happens in your region. Still, after that your Time Zone may be 1 hour ahead of real clock.. so try picking similar time zones and eventually you will set up normal time. Oh, and it's best to set up settings propagation from NVR to IP Cams for convenience and ease of set-up, just make sure you configure static IPs first.
@@ -186,34 +186,34 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
     <img width="1220" height="877" alt="image" src="https://github.com/user-attachments/assets/9ae990e5-db76-4180-b0a6-f7804879052b" /> </details>
 
 - **Stream Setup (RTSP):** [↑](#-table-of-contents)
-
-IP Cameras usually have a few stream channels - Main Stream for high-qulity recordings, saved to HDD/NAS/Cloud and Sub Streams for Live Views(Mobile App, 3rd Party Services(Home Assistant), RTSP Web streams, etc.) Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264. 
-
+  IP Cameras usually have a few stream channels - Main Stream for high-qulity recordings, saved to HDD/NAS/Cloud and Sub Streams for Live Views(Mobile App, 3rd Party Services(Home Assistant), RTSP Web streams, etc.) Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264.
   <details>
     <summary>📸 My Stream Config (Click to Expand)</summary>
 
   <img width="1752" height="724" alt="image" src="https://github.com/user-attachments/assets/49e2f215-72a6-46bc-867b-2b4427dfe189" /> </details>
-
-  Now, Dahua Cams/NVRs(and lots of other vendors) do not have a dedicated "RTSP ON/OFF" switch, and RTSP(_Real Time Streaming Protocol_) is enabled by default. 
-What is important is to understand URL Link structure for Dahua Cams/NVRs. Those do differ vendor to vendor.
+  Now, Dahua Cams/NVRs(and lots of other vendors) do not have a dedicated "RTSP ON/OFF" switch, and RTSP(_Real Time Streaming Protocol_) is enabled by default. What is important is to understand URL Link structure for Dahua Cams/NVRs. Those do differ vendor to vendor.
 
   Example:
-      ```text
-    rtsp://USERNAME:PASSWORD@CAMERA_IP:554/cam/realmonitor?channel=1&subtype=0
-      ```
+
+        `rtsp://USERNAME:PASSWORD@CAMERA_IP:554/cam/realmonitor?channel=1&subtype=0`
+
     Where:
-    - `USERNAME` and `PASSWORD` are the credentials set up on cam web interface(or propagated from NVR), 
-    - `CAMERA_IP` is cam's IPv4/IPv6 address
-    - `554` Port is 554 by default
-    - `channel=1` — first camera input (for NVRs or standalone cam)
-    - `subtype=1` — sub stream (low-res, low bitrate), subtype=0 is usually Main Stream just FYI
+
+     - `USERNAME` and `PASSWORD` are the credentials set up on cam web interface(or propagated from NVR)
+
+     - `CAMERA_IP` is cam's IPv4/IPv6 address
+
+     - `554` Port is 554 by default
+
+     - `channel=1` — first camera input (for NVRs or standalone cam)
+
+     - `subtype=1` — sub stream (low-res, low bitrate), subtype=0 is usually Main Stream just FYI
+
 
  - **Regarding **ONVIF**(_Open Network Video Interface Forum_)** - it allows devices from different manufacturers to work together seamlessly, even if they don't have native compatibility. It also includes features like device discovery, configuration, user management, events, and PTZ (pan-tilt-zoom) control. And allows for it's own **network discovery** - this will become usefull later when we configure go2rtc Add-on for HA, so I recommend enabling it.
-
-  <details>
+   <details>
       <summary>📸 ONVIF Config (Click to Expand)</summary>
-
-  <img width="1626" height="649" alt="image" src="https://github.com/user-attachments/assets/46d87547-33f8-4a41-9f14-12148b5c2965" /> </details>
+    <img width="1626" height="649" alt="image" src="https://github.com/user-attachments/assets/46d87547-33f8-4a41-9f14-12148b5c2965" /> </details>
 
 
 - **User Management:** [↑](#-table-of-contents)
