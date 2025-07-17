@@ -163,7 +163,22 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
   Use Dahua’s [ConfigTool](https://www.dahuasecurity.com/support/downloadCenter) to scan and assign IP addresses, or access directly if your router lists new devices. I prefer doing it via WEB-UI, as long as cam gets IP from DHCP(enabled on default). Also, important thing - make sure to assign Static IPv4 to your cameras and NVR(s) or static DHCP binds in your router/dhcp server configs and in cam WEB-UI/Dahua tool - HA integration will use one IP to get data from Dahua device and we would not want it to change.
   
 - **Time Sync:**  
-  Enable NTP and sync with your Home Assistant device or local NTP server. Time mismatch causes major issues in event automation and recordings.
+  Somehow, Dahua still has well-known issues with Time. Enabling NTP and syncing with your PC didn't work for me most times(my home lab + a few commercial installs). What I really recommend is choosing your Time Zone and setting up DST(Daylight Saving Time) if it happens in your region. Still, after that your Time Zone may be 1 hour ahead of real clock.. so try picking similar time zones and eventually you will set up normal time. Oh, and it's best to set up settings propagation from NVR to IP Cams for convenience and ease of set-up, just make sure you configure static IPs first.
+
+Here are a few screenshots of System/Time WEB Config:
+<details>
+<summary>📸 System Config Propagation (Click to Expand)</summary>
+
+<img width="1310" height="777" alt="image" src="https://github.com/user-attachments/assets/ca31568e-4370-45e8-b076-246054c1e1dc" />
+
+</details> 
+
+<details>
+<summary>📸 Time Settings (Click to Expand)</summary>
+
+<img width="1220" height="877" alt="image" src="https://github.com/user-attachments/assets/9ae990e5-db76-4180-b0a6-f7804879052b" />
+
+</details>
 
 - **Stream Setup (RTSP):**  
   Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264.
