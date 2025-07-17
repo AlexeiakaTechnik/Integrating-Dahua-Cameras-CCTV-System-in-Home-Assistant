@@ -249,13 +249,15 @@ This covers basic configs to manage Camera, get Live RTSP Stream from it, and di
 - **Events:** [↑](#-table-of-contents)
   To cover all bases, I have **Video Detection**(Only Motion Detection), **Smart Motion Detection**(Recognizes Human/Vehicle silhouette), **Audio Detection**(Abnormality threshold based), **Smart Detection**(IVS plan), and **Abnormality Detection**(Network disconnect, Access violation, and Voltage shifts) enabled. Let's cover them one by one:
 
-    - **Video Detection**(Motion Detection) - uses generic algorithm and sensetivity threshold to compare frames and trigger Event. See Screenshot for configuration.
-<details>
-<summary>📸 Video Detection Tab (Click to Expand)</summary>
+    - **Video Detection**(Motion Detection) - uses generic algorithm and sensetivity threshold to compare frames and trigger Event. See Screenshot for configuration. <details>
+                                                                                                                                                                      <summary>📸 Video Detection Tab (Click to                                                                                                                                                                                     Expand)</summary>
 
-<img width="1665" height="826" alt="image" src="https://github.com/user-attachments/assets/53f87545-f60c-4383-9c2e-f70828b2844e" />
+        <img width="1665" height="826" alt="image" src="https://github.com/user-attachments/assets/53f87545-f60c-4383-9c2e-f70828b2844e" /> </details>
+    - 
+ 
+    - 
+      
 
-</details>
     - *
 
 
