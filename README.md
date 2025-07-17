@@ -249,18 +249,74 @@ This covers basic configs to manage Camera, get Live RTSP Stream from it, and di
 - **Events:** [↑](#-table-of-contents)
   To cover all bases, I have **Video Detection**(Only Motion Detection), **Smart Motion Detection**(Recognizes Human/Vehicle silhouette), **Audio Detection**(Abnormality threshold based), **Smart Detection**(IVS plan), and **Abnormality Detection**(Network disconnect, Access violation, and Voltage shifts) enabled. Let's cover them one by one:
 
-    - **Video Detection**(Motion Detection) - uses generic algorithm and sensetivity threshold to compare frames and trigger Event. See Screenshot for configuration. <details>
+    - **Video Detection**(Motion Detection) - uses a generic algorithm and sensitivity threshold to compare frames and trigger an Event. See the Screenshot for the configuration. <details>
                                                                                                                                                                       <summary>📸 Video Detection Tab (Click to                                                                                                                                                                                     Expand)</summary>
 
         <img width="1665" height="826" alt="image" src="https://github.com/user-attachments/assets/53f87545-f60c-4383-9c2e-f70828b2844e" /> </details>
-    - 
+    - **Smart Motion Detection** - uses an advanced algorithm to recognize Human/Vehicle silhouettes to trigger Event. <details>
+                                                                                                                                                                      <summary>📸 Smart Motion Detection Tab (Click to                                                                                                                                                                                     Expand)</summary>
+
+        <img width="1560" height="520" alt="image" src="https://github.com/user-attachments/assets/70a83fbe-0377-4d69-a0d3-a6ea50f37dda" /> </details>
  
-    - 
+    - **Audio Detection** - uses built-in microphone and threshold set to fire an Event if the loudness of sound(db) exceeds said threshold. If you want to catch your neighbours' night party "on video" for evidence =) <details>
+                                                                                                                                                                      <summary>📸 Audio Detection Tab (Click to                                                                                                                                                                                     Expand)</summary>
+
+        <img width="1339" height="866" alt="image" src="https://github.com/user-attachments/assets/685ce275-d6da-4a00-9de8-c9e28fe58bff" /> </details>
       
 
-    - *
+    - **Smart Detection** - manually set borders and "tripwires" for the IVS (Intelligent Video Surveillance) video analytics algorithm to fire an Event if said borders were crossed. A more precise and advanced event scheme, can be used alongside others to get more flags/stamps when searching events on the recorded timeline. <details>
+                                                                                                                                                                      <summary>📸 Smart Plan & IVS Tabs (Click to                                                                                                                                                                                     Expand)</summary>
+
+        <img width="1304" height="569" alt="image" src="https://github.com/user-attachments/assets/e88c948d-c23f-4dea-b4ef-50653793e4ec" />
+        <img width="1781" height="880" alt="image" src="https://github.com/user-attachments/assets/474bcfed-3f6d-4326-9ba0-b665c1653b35" /> </details>
+    - **Abnormality Detection** - uses system/device monitoring as Event triggers. Can be Brute force login attempts, Network or Power outages, IP conflicts, offline Storage or even camera lid/casing opened events. I have Network disconnect, unsuccessful logins, and power events used as triggers. <details>
+                                                                                                                                                                      <summary>📸 Smart Plan & IVS Tabs (Click to                                                                                                                                                                                     Expand)</summary>
+
+        <img width="1357" height="406" alt="image" src="https://github.com/user-attachments/assets/d71e27da-34ab-4d61-9818-467c6b544347" /> </details>
 
 
+One more **important thing regarding events** - you may have a question about "overlapping events", like - "what if we have all of those enabled simultaneously, and a screaming person runs in our camera's frame? Is there going to be a dozen similar recordings cluttering up our storage?" The short answer is - No. For a longer explanation, I have researched it for you! Additional read under spoiler:
+
+<details>
+<summary>📼 TL;DR – What happens if multiple events are triggered at once? (Click to Expand)</summary>
+
+------------------------------------
+**Usual Camera Behavior**
+The camera itself sends individual event notifications (Motion, SMD, Audio, IVS, etc.) — each as a separate trigger. But it does not handle recording logic — it just says: "Hey! Something happened!"
+
+**NVR Behavior – The Decision Maker**
+The NVR controls recording, and here's what matters:
+
+📅 Recording Schedule Type
+In the NVR settings (under “Storage > Schedule”), you define which types of events should trigger recordings:
+
+  - Regular – always recording
+  - Motion – triggered by basic motion detection
+  - Alarm – includes audio detection, IVS, SMD, etc.
+
+MD+Alarm – combo events
+
+If you have Motion + Audio + SMD + IVS all enabled, and they're set to trigger "Alarm Recording", the _NVR will start one continuous recording during that event window, even if multiple triggers fire_.
+It will not create 3 separate video files — it records a unified stream, with a timestamped metadata log of each event.
+
+**Important Notes:**
+Dahua NVRs merge overlapping event triggers into one recording stream. The pre-record and post-record buffer applies once — not per trigger. For example, if SMD and audio fire within 2 seconds of each other, the NVR just keeps rolling. No duplicated storage or clutter, unless you explicitly configure snapshot uploads or FTP per event.
+
+**Example Scenario:**
+A person screams and runs across the camera's field of view, triggering:
+
+  - Motion Detection (entire frame change)
+  - Smart Motion (SMD) for Human
+  - Audio Detection (scream)
+
+**Result:**
+A single recording clip is created (e.g., 18:03:22–18:03:58)
+Each event is logged with its type and timestamp
+You can search/filter later by event type
+
+------------------------------------
+
+</details>
 
 
 
