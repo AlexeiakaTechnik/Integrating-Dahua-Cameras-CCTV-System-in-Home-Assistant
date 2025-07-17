@@ -204,7 +204,7 @@ What is important is to understand URL Link structure for Dahua Cams/NVRs. Those
     - channel=1 — first camera input (for NVRs or standalone cam)
     - subtype=1 — sub stream (low-res, low bitrate), subtype=0 is usually Main Stream just FYI
 
-  Regarding **ONVIF**(_Open Network Video Interface Forum_) - it allows devices from different manufacturers to work together seamlessly, even if they don't have native compatibility. It also includes features like device discovery, configuration, user management, events, and PTZ (pan-tilt-zoom) control. And allows for it's own **network discovery** - this will become usefull later when we configure go2rtc Add-on for HA, so I recommend enabling it.
+ - **Regarding **ONVIF**(_Open Network Video Interface Forum_)** - it allows devices from different manufacturers to work together seamlessly, even if they don't have native compatibility. It also includes features like device discovery, configuration, user management, events, and PTZ (pan-tilt-zoom) control. And allows for it's own **network discovery** - this will become usefull later when we configure go2rtc Add-on for HA, so I recommend enabling it.
 
 <details>
 <summary>📸 ONVIF Config (Click to Expand)</summary>
