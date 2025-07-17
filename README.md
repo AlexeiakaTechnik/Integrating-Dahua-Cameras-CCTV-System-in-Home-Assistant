@@ -124,7 +124,7 @@ In comparison with other known brands, like Hikvision, Dahua offers pretty much 
 
 Setting up CCTV cameras isn't just about plugging them in. The physical mounting, angle, network planning, and web-based configuration all impact reliability, detection accuracy, and automation success.
 
-### 📍 Physical Installation Tips
+### 📍 4.1 Physical Installation Tips [↑](#-table-of-contents)
 
 - **Mounting height:** For human detection, 2.5–3 meters is ideal. Too high and you miss faces/details, too low and you decrese field of view and invite tampering.
 - **Avoid glare:** Don’t point cameras directly at light sources (sun!, lamps, or car headlights). Use **turret-style cams** outdoors to reduce IR reflection.
@@ -155,7 +155,7 @@ Another **video** **-** **overview of NVR, POE Switch, network and Security Moni
 
 ---
 
-### 🌐 Web-Based Configuration
+### 🌐 4.2 Web-Based Configuration [↑](#-table-of-contents)
 
 Each Dahua camera has a built-in web UI, accessible via IP address. This is where most critical config is done before HA integration.
 
@@ -180,10 +180,41 @@ Here are a few screenshots of System/Time WEB Config:
 
 </details>
 
-- **Stream Setup (RTSP):**  
-  Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264.
+- **Stream Setup (RTSP):** [↑](#-table-of-contents)
+  IP Cameras usually have a few stream channels - Main Stream for high-qulity recordings, saved to HDD/NAS/Cloud and Sub Streams for Live Views(Mobile App, 3rd Party Services(Home Assistant), RTSP Web streams, etc.) Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264. 
 
-- **User Management:**  
+<details>
+<summary>📸 My Stream Config (Click to Expand)</summary>
+
+<img width="1752" height="724" alt="image" src="https://github.com/user-attachments/assets/49e2f215-72a6-46bc-867b-2b4427dfe189" />
+
+</details>
+
+  Now, Dahua Cams/NVRs(and lots of other vendors) do not have a dedicated "RTSP ON/OFF" switch, and RTSP(_Real Time Streaming Protocol_) is enabled by default. 
+What is important is to understand URL Link structure for Dahua Cams/NVRs. Those do differ vendor to vendor.
+
+  Example:
+      ```text
+    rtsp://USERNAME:PASSWORD@CAMERA_IP:554/cam/realmonitor?channel=1&subtype=0
+      ```
+    Where:
+    - USERNAME and PASSWORD are the credentials set up on cam web interface(or propagated from NVR), 
+    - IP is cam's IPv4 address
+    - Port is 554 by default
+    - channel=1 — first camera input (for NVRs or standalone cam)
+    - subtype=1 — sub stream (low-res, low bitrate), subtype=0 is usually Main Stream just FYI
+
+  Regarding **ONVIF**(_Open Network Video Interface Forum_) - it allows devices from different manufacturers to work together seamlessly, even if they don't have native compatibility. It also includes features like device discovery, configuration, user management, events, and PTZ (pan-tilt-zoom) control. And allows for it's own **network discovery** - this will become usefull later when we configure go2rtc Add-on for HA, so I recommend enabling it.
+
+<details>
+<summary>📸 ONVIF Config (Click to Expand)</summary>
+
+<img width="1626" height="649" alt="image" src="https://github.com/user-attachments/assets/46d87547-33f8-4a41-9f14-12148b5c2965" />
+
+</details>
+
+
+- **User Management:** 
   Create a dedicated `homeassistant` user with only the needed permissions. Avoid using admin credentials for automation integrations.
 
 - **Port Layout (defaults):**  
