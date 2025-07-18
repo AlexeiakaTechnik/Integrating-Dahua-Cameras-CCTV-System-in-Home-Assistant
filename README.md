@@ -6,7 +6,6 @@
 _Getting Dahua NVRs and cameras into Home Assistant with actionable smart events.  
 Integration walkthrough with go2rtc, smart motion detection, light automations, RTSP streaming setup, and best-practice camera configs._
 
-
 ---
 
 ## 📚 Table of Contents
@@ -28,7 +27,6 @@ Integration walkthrough with go2rtc, smart motion detection, light automations, 
 
 ---
 
-
 ## 🔍 1. Introduction [↑](#-table-of-contents)
 
 Modern CCTV systems often come with their own closed ecosystems, mobile apps, and cloud dependencies. While this works for average users, advanced users (us with HA) and integrators increasingly seek **local control**, **event-based automations**, and **unified dashboards**.
@@ -43,9 +41,7 @@ The goal was simple:
 
 If you're looking for a **stable, private, and responsive** way to bring your CCTV system into your smart home, this guide covers the full pipeline: from camera installation and Dahua setup to smart lighting automations, dashboards, and UI best practices.
 
-
 ---
-
 
 ## 🧰 2. Requirements [↑](#-table-of-contents)
 
@@ -75,9 +71,7 @@ Before starting the integration, make sure you have the following or equivalent 
 - **Decent HA hardware**  
   _Raspberry Pi 4 is a minimal baseline. More cams = better CPU and storage. Also dashboard tablets/phones should have decent performance to quickly load multiple streams_
 
-
 ---
-
 
 ## 🧱 3. Dahua Cameras Overview & Integration Limitations [↑](#-table-of-contents)
 
@@ -120,7 +114,6 @@ In comparison with other known brands, like Hikvision, Dahua offers pretty much 
 
 ---
 
-
 ## 🛠️ 4. Camera(s) Installation Tips and Web-based Setup [↑](#-table-of-contents)
 
 Setting up CCTV cameras isn't just about plugging them in. The physical mounting, angle, network planning, and web-based configuration all impact reliability, detection accuracy, and automation success.
@@ -154,22 +147,20 @@ Another **video** **-** **overview of NVR, POE Switch, network and Security Moni
 
 </details>
 
-
 ---
-
 
 ### 🌐 4.2 Web-Based Configuration [↑](#-table-of-contents)
 
 Each Dahua camera has a built-in web UI, accessible via IP address. This is where most critical config is done before HA integration.
 
-#### **Initial IP Setup:**  
+- **Initial IP Setup:**  
   Use Dahua’s [ConfigTool](https://www.dahuasecurity.com/support/downloadCenter) to scan and assign IP addresses, or access directly if your router lists new devices. I prefer doing it via WEB-UI, as long as cam gets IP from DHCP(enabled on default). Also, important thing - make sure to assign Static IPv4 to your cameras and NVR(s) or static DHCP binds in your router/dhcp server configs and in cam WEB-UI/Dahua tool - HA integration will use one IP to get data from Dahua device and we would not want it to change. <details>
                                                                                                 <summary>📸 IP Config (Click to Expand)</summary>
                                                          <img width="1643" height="679" alt="image" src="https://github.com/user-attachments/assets/75ef5e8d-88ac-44e6-bf71-8d486d1b3ddc" /> </details> 
 
     > 🔐 _Security Tip:_ Disable UPnP on your router and change default Dahua passwords immediately.
 
-#### **Port Layout (defaults):**  
+- **Port Layout (defaults):**  
   - Web UI: `HTTP 80` / `HTTPS 443`
   - RTSP: `554` - change if you need
   - ONVIF - uses HTTP/HTTPS for communication: usually `8080` or `80`  or `443`
@@ -180,7 +171,7 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
 
   <img width="1618" height="697" alt="image" src="https://github.com/user-attachments/assets/efbbe5a6-ef65-4cb8-a378-f2e6468ebf4d" /> </details>
 
-#### **Time Sync:**  
+- **Time Sync:**  
   Somehow, Dahua still has well-known issues with Time. Enabling NTP and syncing with your PC didn't work for me most times(my home lab + a few commercial installs). What I really recommend is choosing your Time Zone and setting up DST(Daylight Saving Time) if it happens in your region. Still, after that your Time Zone may be 1 hour ahead of real clock.. so try picking similar time zones and eventually you will set up normal time. Oh, and it's best to set up settings propagation from NVR to IP Cams for convenience and ease of set-up, just make sure you configure static IPs first.
 
   Here are a few screenshots of System/Time WEB Config:
@@ -194,7 +185,7 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
 
     <img width="1220" height="877" alt="image" src="https://github.com/user-attachments/assets/9ae990e5-db76-4180-b0a6-f7804879052b" /> </details>
 
-#### **Stream Setup (RTSP):** [↑](#-table-of-contents)
+- **Stream Setup (RTSP):** [↑](#-table-of-contents)
   IP Cameras usually have a few stream channels - Main Stream for high-qulity recordings, saved to HDD/NAS/Cloud and Sub Streams for Live Views(Mobile App, 3rd Party Services(Home Assistant), RTSP Web streams, etc.) Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264.
   <details>
     <summary>📸 My Stream Config (Click to Expand)</summary>
@@ -206,66 +197,67 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
 
         `rtsp://USERNAME:PASSWORD@CAMERA_IP:554/cam/realmonitor?channel=1&subtype=0`
 
-  Where:
+    Where:
 
-  - `USERNAME` and `PASSWORD` are the credentials set up on cam web interface(or propagated from NVR)
+     - `USERNAME` and `PASSWORD` are the credentials set up on cam web interface(or propagated from NVR)
 
-  - `CAMERA_IP` is cam's IPv4/IPv6 address
+     - `CAMERA_IP` is cam's IPv4/IPv6 address
 
-  - `554` Port is 554 by default
+     - `554` Port is 554 by default
 
-  - `channel=1` — first camera input (for NVRs or standalone cam)
+     - `channel=1` — first camera input (for NVRs or standalone cam)
 
-  - `subtype=1` — sub stream (low-res, low bitrate), subtype=0 is usually Main Stream just FYI
+     - `subtype=1` — sub stream (low-res, low bitrate), subtype=0 is usually Main Stream just FYI
 
-      **Regarding **ONVIF**(_Open Network Video Interface Forum_)** - it allows devices from different manufacturers to work together seamlessly, even if they don't have native compatibility. It also includes features like device discovery, configuration, user management, events, and PTZ (pan-tilt-zoom) control. And allows for it's own **network discovery** - this will become usefull later when we configure go2rtc Add-on for HA, so I recommend enabling it.
+
+ - **Regarding **ONVIF**(_Open Network Video Interface Forum_)** - it allows devices from different manufacturers to work together seamlessly, even if they don't have native compatibility. It also includes features like device discovery, configuration, user management, events, and PTZ (pan-tilt-zoom) control. And allows for it's own **network discovery** - this will become usefull later when we configure go2rtc Add-on for HA, so I recommend enabling it.
    <details>
       <summary>📸 ONVIF Config (Click to Expand)</summary>
     <img width="1626" height="649" alt="image" src="https://github.com/user-attachments/assets/46d87547-33f8-4a41-9f14-12148b5c2965" /> </details>
 
 
-#### **User Management:** [↑](#-table-of-contents)
+- **User Management:** [↑](#-table-of-contents)
   Create a dedicated `homeassistant` user with only the needed permissions(live is enough). Avoid using admin credentials for automation integrations. Make sure to write down username and password - those are used to access RTSP link.
   Example:
 
   <details>
     <summary>📸 Add user (Click to Expand)</summary>
 
-  <img width="1605" height="712" alt="image" src="https://github.com/user-attachments/assets/b85ead90-bcc4-4571-979d-bb8de4436da5" /> </details>
+    <img width="1605" height="712" alt="image" src="https://github.com/user-attachments/assets/b85ead90-bcc4-4571-979d-bb8de4436da5" /> </details>
 
 
 **This covers basic configs to manage Camera, get Live RTSP Stream from it, and discover them via ONVIF. But we need the events themselves to bind Home Assistant Automations to. In order to do this let's make sure Event(s) are configured correctly on the Camera(s)**
 
 ---
 
-#### **Events:** [↑](#-table-of-contents)
+- **Events:** [↑](#-table-of-contents)
   
   To cover all bases, I have **Video Detection**(Only Motion Detection), **Smart Motion Detection**(Recognizes Human/Vehicle silhouette), **Audio Detection**(Abnormality threshold based), **Smart Detection**(IVS   plan), and **Abnormality Detection**(Network disconnect, Access violation, and Voltage shifts) enabled. Let's cover them one by one:
 
-  - **Video Detection**(Motion Detection) - uses a generic algorithm and sensitivity threshold to compare frames and trigger an Event. See the Screenshot for the configuration. <details>
+    - **Video Detection**(Motion Detection) - uses a generic algorithm and sensitivity threshold to compare frames and trigger an Event. See the Screenshot for the configuration. <details>
                                                                                                                                                                       <summary>📸 Video Detection Tab (Click to                                                                                                                                                                                     Expand)</summary>
 
-    <img width="1665" height="826" alt="image" src="https://github.com/user-attachments/assets/53f87545-f60c-4383-9c2e-f70828b2844e" /> </details>
-  - **Smart Motion Detection** - uses an advanced algorithm to recognize Human/Vehicle silhouettes to trigger Event. <details>
+        <img width="1665" height="826" alt="image" src="https://github.com/user-attachments/assets/53f87545-f60c-4383-9c2e-f70828b2844e" /> </details>
+    - **Smart Motion Detection** - uses an advanced algorithm to recognize Human/Vehicle silhouettes to trigger Event. <details>
                                                                                                                                                                       <summary>📸 Smart Motion Detection Tab (Click to                                                                                                                                                                                     Expand)</summary>
 
-    <img width="1560" height="520" alt="image" src="https://github.com/user-attachments/assets/70a83fbe-0377-4d69-a0d3-a6ea50f37dda" /> </details>
+        <img width="1560" height="520" alt="image" src="https://github.com/user-attachments/assets/70a83fbe-0377-4d69-a0d3-a6ea50f37dda" /> </details>
  
-  - **Audio Detection** - uses built-in microphone and threshold set to fire an Event if the loudness of sound(db) exceeds said threshold. If you want to catch your neighbours' night party "on video" for evidence =) <details>
+    - **Audio Detection** - uses built-in microphone and threshold set to fire an Event if the loudness of sound(db) exceeds said threshold. If you want to catch your neighbours' night party "on video" for evidence =) <details>
                                                                                                                                                                       <summary>📸 Audio Detection Tab (Click to                                                                                                                                                                                     Expand)</summary>
 
-    <img width="1339" height="866" alt="image" src="https://github.com/user-attachments/assets/685ce275-d6da-4a00-9de8-c9e28fe58bff" /> </details>
+        <img width="1339" height="866" alt="image" src="https://github.com/user-attachments/assets/685ce275-d6da-4a00-9de8-c9e28fe58bff" /> </details>
       
 
-  - **Smart Detection** - manually set borders and "tripwires" for the IVS (Intelligent Video Surveillance) video analytics algorithm to fire an Event if said borders were crossed. A more precise and advanced event scheme, can be used alongside others to get more flags/stamps when searching events on the recorded timeline. <details>
+    - **Smart Detection** - manually set borders and "tripwires" for the IVS (Intelligent Video Surveillance) video analytics algorithm to fire an Event if said borders were crossed. A more precise and advanced event scheme, can be used alongside others to get more flags/stamps when searching events on the recorded timeline. <details>
                                                                                                                                                                       <summary>📸 Smart Plan & IVS Tabs (Click to                                                                                                                                                                                     Expand)</summary>
 
-    <img width="1304" height="569" alt="image" src="https://github.com/user-attachments/assets/e88c948d-c23f-4dea-b4ef-50653793e4ec" />
-    <img width="1781" height="880" alt="image" src="https://github.com/user-attachments/assets/474bcfed-3f6d-4326-9ba0-b665c1653b35" /> </details>
-  - **Abnormality Detection** - uses system/device monitoring as Event triggers. Can be Brute force login attempts, Network or Power outages, IP conflicts, offline Storage or even camera lid/casing opened events. I have Network disconnect, unsuccessful logins, and power events used as triggers. <details>
+        <img width="1304" height="569" alt="image" src="https://github.com/user-attachments/assets/e88c948d-c23f-4dea-b4ef-50653793e4ec" />
+        <img width="1781" height="880" alt="image" src="https://github.com/user-attachments/assets/474bcfed-3f6d-4326-9ba0-b665c1653b35" /> </details>
+    - **Abnormality Detection** - uses system/device monitoring as Event triggers. Can be Brute force login attempts, Network or Power outages, IP conflicts, offline Storage or even camera lid/casing opened events. I have Network disconnect, unsuccessful logins, and power events used as triggers. <details>
                                                                                                                                                                       <summary>📸 Smart Plan & IVS Tabs (Click to                                                                                                                                                                                     Expand)</summary>
 
-    <img width="1357" height="406" alt="image" src="https://github.com/user-attachments/assets/d71e27da-34ab-4d61-9818-467c6b544347" /> </details>
+        <img width="1357" height="406" alt="image" src="https://github.com/user-attachments/assets/d71e27da-34ab-4d61-9818-467c6b544347" /> </details>
 
 
 One more **important thing regarding events** - you may have a question about "overlapping events", like - "what if we have all of those enabled simultaneously, and a screaming person runs in our camera's frame? Is there going to be a dozen similar recordings cluttering up our storage?" The short answer is - No. For a longer explanation, I have researched it for you! Additional read under spoiler:
@@ -314,99 +306,13 @@ You can search/filter later by event type
 
 ---
 
-
 ## 🏠 5. Integrating with Home Assistant [↑](#-table-of-contents)
 
-Once your Dahua devices are installed, configured, and visible on your network with static IPs, it's time to bring them into **Home Assistant**.
-
-We’ll use a **custom HACS integration** maintained by the community (not included in Home Assistant core), which provides access to camera channels and smart events like motion, IVS, and tamper.
-
----
-
-### 📦 Install Dahua Integration via HACS
-
-This integration is maintained by @rroller and lives here:  
-🔗 https://github.com/rroller/dahua
-
-#### ➕ Step-by-step:
-1. Open Home Assistant → **HACS → Integrations → + Explore & Download Repositories**
-2. Search for **"Dahua"**
-3. Select **"Dahua NVR/Camera Integration"** by `rroller`
-4. Install the integration and restart Home Assistant
-5. Then go to **Settings → Devices & Services → + Add Integration**
-6. Search for **"Dahua"** and follow the setup wizard
-
-You’ll need:
-- IP address of your **camera** or **NVR**
-- Username/password (e.g., the `homeassistant` user you created earlier)
-- HTTP/HTTPS port (usually `80` or `443`)
-
----
-
-### 🎛️ What Gets Added
-
-If successful, you’ll now see:
-- `binary_sensor.motion_front_yard`
-- `binary_sensor.ivs_tripwire_backyard`
-- `binary_sensor.tamper_cam1`
-- Optional: fan/speaker toggles (if supported by cam)
-
-Each smart event becomes a **binary sensor** in HA — perfect for automations and scripts.
-
----
-
-### 🔁 Understanding Channels
-
-Each camera channel corresponds to its port order in the NVR (or to `channel=1` if you’re using a standalone cam).
-
-| Channel | HA Entity Example                  | Notes                        |
-|---------|------------------------------------|------------------------------|
-| 1       | `binary_sensor.ivs_tripwire_ch1`   | Front Yard |
-| 2       | `binary_sensor.motion_detection_ch2` | Driveway   |
-| ...     | ...                                | Depends on your setup       |
-
----
-
-### 📡 Update Frequency
-
-The integration uses **polling**, not push notifications:
-- Expect ~1–5 second delay from camera event → HA trigger
-- Very stable once configured, but not millisecond-precise
-
----
-
-### 🔐 Permissions Reminder
-
-The user used for HA integration must:
-- Have **Live View** permission for all desired channels
-- Have **RTSP** and **ONVIF** enabled
-- Be granted in the camera/NVR config, not just auto-created
-
----
-
-### ❌ Limitations (as of writing)
-- No support for **Face Detection**, **People Counting**, etc.
-- **Two-way audio** is not exposed
-- **Camera recording control** is not available
-- No **PTZ support** via HA (manual-only or API/hacks)
-
----
-
-### 🧪 Troubleshooting
-
-- ❓ **No devices/entities show up?**  
-  Double-check IP address, port (80/443), and credentials. Try the same login in browser.
-
-- ❓ **Motion not working?**  
-  Confirm it’s enabled in the Dahua Web UI and assigned to correct channel.
-
-- ❓ **HA isn’t seeing the right channels?**  
-  Try adding individual cameras instead of the NVR, or vice versa. Some models behave better one way.
-
----
-
-This completes the event stream setup from Dahua → Home Assistant.  
-Next, we’ll connect the **RTSP feeds via go2rtc** for low-latency live view and camera dashboard UI.
+- Installing the [Dahua Integration](https://www.home-assistant.io/integrations/dahua/)
+- HACS alternatives (if used)
+- Adding cameras or NVR via IP + credentials
+- Channel explanation (CAM1 = channel 1, etc.)
+- Events supported: motion, IVS tripwire, tamper
 
 ![image](PLACEHOLDER FOR SCREENSHOTS FROM HA-DAHUA INTEGRATION)
 
