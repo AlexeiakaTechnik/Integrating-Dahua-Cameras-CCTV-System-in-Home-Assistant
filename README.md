@@ -34,9 +34,9 @@ Modern CCTV systems often come with their own closed ecosystems, mobile apps, an
 This article documents my hands-on experience integrating a **Dahua NVR and multiple IP cameras** into **Home Assistant**, using tools like `go2rtc` for RTSP stream handling and the official Dahua integration for **smart event-based triggers**.
 
 The goal was simple:  
-- **Stream all cameras reliably inside Home Assistant**,  
-- **Use Dahua's advanced detection events (tripwires, IVS)** as triggers,  
-- **Avoid cloud lock-in**,  
+- **Stream all cameras reliably inside Home Assistant**
+- **Use Dahua's advanced detection events (tripwires, IVS, smart motion)** as triggers 
+- **Avoid cloud lock-in**
 - And **make security visuals and controls available on wall-mounted tablets and mobile phones.**
 
 If you're looking for a **stable, private, and responsive** way to bring your CCTV system into your smart home, this guide covers the full pipeline: from camera installation and Dahua setup to smart lighting automations, dashboards, and UI best practices.
@@ -123,7 +123,7 @@ Setting up CCTV cameras isn't just about plugging them in. The physical mounting
 - **Mounting height:** For human detection, 2.5–3 meters is ideal. Too high and you miss faces/details, too low and you decrese field of view and invite tampering.
 - **Avoid glare:** Don’t point cameras directly at light sources (sun!, lamps, or car headlights). Use **turret-style cams** outdoors to reduce IR reflection.
 - **Shelter from weather:** Even IP67-rated cams benefit from small roof covers. It protects lenses from raindrops and maintains clean image quality. While installing, make sure to use additional compatible camera mounts(IP67). They are sold separately. 
-- **Cable management:** Always use weatherproof boxes or grommets for cable exits. Very important advice - do not neglect RJ45 waterproof connector caps, even if you are sure there is no water getting near the camera! One unfortunate rain/thunderstorm/flood and POE can short. For long-term durability, run PoE via proper CAT5e/6 cabling inside walls or conduit.
+- **Cable management:** Always use weatherproof boxes or grommets for cable exits. Very important advice - do not neglect RJ45 waterproof connector caps, even if you are sure there is no water getting near the camera! One unfortunate rain/thunderstorm/flood and POE can short contacts. For long-term durability, run PoE via proper CAT5e/6 cabling inside walls or conduit.
 - **No blind spots:** Review camera fields of view in real time during installation. Avoid overly wide angles where humans become tiny blobs.
 - Do not neglect **personal safety** on ladders/hights! Make sure someone is available to help you. 
 
@@ -154,7 +154,7 @@ Another **video** **-** **overview of NVR, POE Switch, network and Security Moni
 Each Dahua camera has a built-in web UI, accessible via IP address. This is where most critical config is done before HA integration.
 
 - **Initial IP Setup:**  
-  Use Dahua’s [ConfigTool](https://www.dahuasecurity.com/support/downloadCenter) to scan and assign IP addresses, or access directly if your router lists new devices. I prefer doing it via WEB-UI, as long as cam gets IP from DHCP(enabled on default). Also, important thing - make sure to assign Static IPv4 to your cameras and NVR(s) or static DHCP binds in your router/dhcp server configs and in cam WEB-UI/Dahua tool - HA integration will use one IP to get data from Dahua device and we would not want it to change. <details>
+  Use Dahua’s [ConfigTool](https://www.dahuasecurity.com/support/downloadCenter) to scan and assign IP addresses, or access directly if your router lists new devices. I prefer doing it via WEB-UI, as long as cam gets IP from DHCP(enabled by default). Also, an important thing - make sure to assign Static IPv4 to your cameras and NVR(s) or static DHCP binds in your router/dhcp server configs, and inside cam/nvr WEB-UI/Dahua tool - HA integration will use one IP to get data from Dahua device, and we would not want it to change. <details>
                                                                                                 <summary>📸 IP Config (Click to Expand)</summary>
                                                          <img width="1643" height="679" alt="image" src="https://github.com/user-attachments/assets/75ef5e8d-88ac-44e6-bf71-8d486d1b3ddc" /> </details> 
 
@@ -172,7 +172,7 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
   <img width="1618" height="697" alt="image" src="https://github.com/user-attachments/assets/efbbe5a6-ef65-4cb8-a378-f2e6468ebf4d" /> </details>
 
 - **Time Sync:**  
-  Somehow, Dahua still has well-known issues with Time. Enabling NTP and syncing with your PC didn't work for me most times(my home lab + a few commercial installs). What I really recommend is choosing your Time Zone and setting up DST(Daylight Saving Time) if it happens in your region. Still, after that your Time Zone may be 1 hour ahead of real clock.. so try picking similar time zones and eventually you will set up normal time. Oh, and it's best to set up settings propagation from NVR to IP Cams for convenience and ease of set-up, just make sure you configure static IPs first.
+  Somehow, Dahua still has well-known issues with Time. Enabling NTP and syncing with your PC didn't work for me most of the time(my home lab + a few commercial installs). What I recommend is choosing your Time Zone and enabling DST(Daylight Saving Time) if it happens in your region. Still, after that, your Time Zone may be 1 hour ahead of the real clock.. so try picking similar time zones, and eventually you will set achieve the correct time. Oh, and it's best to set up settings propagation from NVR to IP Cams for convenience and ease of set-up. Just make sure you configure static IPs first.
 
   Here are a few screenshots of System/Time WEB Config:
   <details>
@@ -186,7 +186,7 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
     <img width="1220" height="877" alt="image" src="https://github.com/user-attachments/assets/9ae990e5-db76-4180-b0a6-f7804879052b" /> </details>
 
 - **Stream Setup (RTSP):** [↑](#-table-of-contents)
-  IP Cameras usually have a few stream channels - Main Stream for high-qulity recordings, saved to HDD/NAS/Cloud and Sub Streams for Live Views(Mobile App, 3rd Party Services(Home Assistant), RTSP Web streams, etc.) Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264.
+  IP Cameras usually have a few stream channels - Main Stream for high-quality recordings, saved to HDD/NAS/Cloud, and Sub Streams for Live Views(Mobile App, 3rd Party Services(Home Assistant), RTSP Web streams, etc.) Enable both **Main Stream** (for recordings) and **Sub Stream** (for dashboards or live view). Match resolutions and codecs to what go2rtc or HA supports best — typically H.264.
   <details>
     <summary>📸 My Stream Config (Click to Expand)</summary>
 
@@ -207,7 +207,7 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
 
      - `channel=1` — first camera input (for NVRs or standalone cam)
 
-     - `subtype=1` — sub stream (low-res, low bitrate), subtype=0 is usually Main Stream just FYI
+     - `subtype=1` — sub stream (low-res, low bitrate), subtype=0 is usually Main Stream, just FYI
 
 
  - **Regarding **ONVIF**(_Open Network Video Interface Forum_)** - it allows devices from different manufacturers to work together seamlessly, even if they don't have native compatibility. It also includes features like device discovery, configuration, user management, events, and PTZ (pan-tilt-zoom) control. And allows for it's own **network discovery** - this will become usefull later when we configure go2rtc Add-on for HA, so I recommend enabling it.
@@ -226,7 +226,7 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
     <img width="1605" height="712" alt="image" src="https://github.com/user-attachments/assets/b85ead90-bcc4-4571-979d-bb8de4436da5" /> </details>
 
 
-**This covers basic configs to manage Camera, get Live RTSP Stream from it, and discover them via ONVIF. But we need the events themselves to bind Home Assistant Automations to. In order to do this let's make sure Event(s) are configured correctly on the Camera(s)**
+**This covers basic configs to manage Camera, get Live RTSP Stream from it, and discover them via ONVIF. But we need the events themselves to bind Home Assistant Automations to. In order to do this, let's make sure Event(s) are configured correctly on the Camera(s)**
 
 ---
 
@@ -249,12 +249,12 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
         <img width="1339" height="866" alt="image" src="https://github.com/user-attachments/assets/685ce275-d6da-4a00-9de8-c9e28fe58bff" /> </details>
       
 
-    - **Smart Detection** - manually set borders and "tripwires" for the IVS (Intelligent Video Surveillance) video analytics algorithm to fire an Event if said borders were crossed. A more precise and advanced event scheme, can be used alongside others to get more flags/stamps when searching events on the recorded timeline. <details>
+    - **Smart Detection** - manually set borders and "tripwires" for the IVS (Intelligent Video Surveillance) video analytics algorithm to fire an Event if said borders were crossed. A more precise and advanced event scheme can be used alongside others to get more flags/stamps when searching events on the recorded timeline. <details>
                                                                                                                                                                       <summary>📸 Smart Plan & IVS Tabs (Click to                                                                                                                                                                                     Expand)</summary>
 
         <img width="1304" height="569" alt="image" src="https://github.com/user-attachments/assets/e88c948d-c23f-4dea-b4ef-50653793e4ec" />
         <img width="1781" height="880" alt="image" src="https://github.com/user-attachments/assets/474bcfed-3f6d-4326-9ba0-b665c1653b35" /> </details>
-    - **Abnormality Detection** - uses system/device monitoring as Event triggers. Can be Brute force login attempts, Network or Power outages, IP conflicts, offline Storage or even camera lid/casing opened events. I have Network disconnect, unsuccessful logins, and power events used as triggers. <details>
+    - **Abnormality Detection** - uses system/device monitoring as Event triggers. Can be Brute force login attempts, Network or Power outages, IP conflicts, offline Storage, or even camera lid/casing opening events. I have Network disconnect, unsuccessful logins, and power events used as triggers. <details>
                                                                                                                                                                       <summary>📸 Smart Plan & IVS Tabs (Click to                                                                                                                                                                                     Expand)</summary>
 
         <img width="1357" height="406" alt="image" src="https://github.com/user-attachments/assets/d71e27da-34ab-4d61-9818-467c6b544347" /> </details>
@@ -308,8 +308,6 @@ You can search/filter later by event type
 
 ## 🏠 5. Integrating with Home Assistant [↑](#-table-of-contents)
 
-## 🏠 5. Integrating with Home Assistant [↑](#-table-of-contents)
-
 Now that your Dahua cameras and NVR are physically installed, configured, and confirmed to be working (ONVIF/RTSP tested, static IPs set, events firing), let’s integrate them into **Home Assistant** to begin automation and dashboard magic.
 
 We’ll be using the **community-made Dahua integration by `@rroller`**, which supports motion detection, IVS events (tripwire, intrusion), tamper sensors, and more. It’s **not part of core HA**, so we install it via **HACS**.
@@ -336,9 +334,9 @@ Once that’s done:
    - You can use either HTTP (port 80) or HTTPS (port 443)
    - RTSP port is 554 by default. Change it if you use a different port
    - Make sure you select the right Channel(0 if you add single camera and 0,1,2,3,.. if you add cameras through NVR and Cams are assigned different channels in NVR config and NVR Config Channel 1 will be 0 when added, NVR Chanell 2 will be 1 and so on) 
-   - Enter the credentials of the `homeassistant` user you [created earlier](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#-42-web-based-configuration-) in Dahua's Web Interface.
+   - Enter the credentials of the `homeassistant` user you have [created earlier](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#-42-web-based-configuration-) in Dahua's Web Interface.
    - Choose Events checkboxes depending on functions available for your camera, like Face Detection, parking Detection, Crowd or Rioting Detection, Object Placement/Removal, etc.
-   - Once done, the Dahua integration entries will be populated with entities. Once finished, I advice to assign proper names, rooms/areas, and labels to entities for easier navigation.
+   - Once done, the Dahua integration entries will be populated with entities. When finished, I advise assigning proper names, rooms/areas, and labels to entities for easier navigation and management.
 
 ---
 
@@ -349,7 +347,7 @@ The integration will detect:
 - All supported **binary sensors** for events
 - Other misc. and config/diagnostic entities
 Such as:
-  - ⚡🚨 `binary_sensor.cross_line_alarm, binary_sensor.cross_region_detection, binary_sensor.motion_alarm, etc.` for tripwire, motion, etc.
+  - ⚡🚨 `binary_sensor.cross_line_alarm, binary_sensor.cross_region_detection, binary_sensor.motion_alarm, etc.` for tripwire, motion detection events, etc.
   - 🛑 `camera.main, camera.sub, camera.sub_2, etc.` for stream channels
   - 🧠 `binary_sensor.smart_motion_human and binary_sensor.smart_motion_vehicle` for smart motion detection events
 
@@ -367,27 +365,12 @@ trigger:
 
 ---
 
-### 🔁 5.3 Performance Optimization - Replacing Camera Streams with go2rtc addon Links
-
-Each Dahua NVR channel = one camera input.  
-Standalone cameras will usually appear as `channel=1`.
-
-| NVR Channel | HA Entity Example                   | Notes              |
-|-------------|--------------------------------------|---------------------|
-| 1           | `binary_sensor.ivs_tripwire_ch1`     | Front Yard Cam      |
-| 2           | `binary_sensor.motion_detection_ch2` | Backyard Cam        |
-| 3+          | ...                                  | Additional Inputs   |
-
-*Tip: You can rename these entities in HA for clarity.*
-
----
-
-### 🚫 5.4 Integration Limitations
+### 🚫 5.3 Integration Limitations
 
 The current Dahua HACS integration **does not support:**
-- Two-way audio or microphone streaming from HA to Camera(you can try going around it and add 1 or 2-way audio via go2rtc add-on, see go2rtc Configuration section or check out my [Dahua VTO Doorbells Github Repo/Guide](https://github.com/AlexeiakaTechnik/Integration-of-Dahua-VTOs-Doorbells-into-Home-Assistant-and-creating-UI-for-it)).
+- Two-way audio or microphone streaming from HA to Camera(you can try going around it and add 1 or 2-way audio via go2rtc add-on, see [go2rtc Configuration section](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#-64-manual-configuration-go2rtcyaml) or check out my [Dahua VTO Doorbells Github Repo/Guide](https://github.com/AlexeiakaTechnik/Integration-of-Dahua-VTOs-Doorbells-into-Home-Assistant-and-creating-UI-for-it)).
 - Full PTZ control or presets  
-- Face detection / People counting / Smart tracking  
+- Face detection / People counting / Smart tracking (can be circumvented by using Frigate or other AI object detection tool - see [Further Improvement section](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#-11-conclusions-and-further-improvement-) for more details)
 - Event push via WebSocket — it's **poll-based**, meaning events may appear with a **1–5s delay**
 
 Despite that, it’s **very stable and reliable**, and more than enough to trigger lights, alarms, notifications, or camera popups.
@@ -410,8 +393,6 @@ In the next chapter, we’ll cover how to **embed live RTSP feeds** into your da
 ![image](PLACEHOLDER FOR SCREENSHOTS FROM HA-DAHUA INTEGRATION)
 
 ---
-
-## 📡 6. RTSP Streams and go2rtc Configuration [↑](#-table-of-contents)
 
 ## 📡 6. RTSP Streams and go2rtc Configuration [↑](#-table-of-contents)
 
