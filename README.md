@@ -396,7 +396,7 @@ In the next chapter, we’ll cover how to **embed live RTSP feeds** into your da
 
 ## 📡 6. RTSP Streams and go2rtc Configuration [↑](#-table-of-contents)
 
-While the Dahua integration brings smart event triggers into Home Assistant, it does **not** handle live video streams.  
+While the Dahua integration brings smart event triggers into Home Assistant, it does not handle live video streams as fast as we need to populate an HA dashboard with multiple live Camera feeds.  
 For that, we’ll use **go2rtc** — a powerful, low-latency multiprotocol stream proxy that works perfectly with Dahua's RTSP output.
 
 This chapter covers setting up live video streams inside Home Assistant using Dahua’s RTSP and `go2rtc` add-on.
@@ -451,10 +451,6 @@ Avoid using `camera.main` / `camera.sub` from the Dahua integration for live das
 
 </details>
 
-
-
-
-
 ---
 
 ### 📥 6.2 Installing go2rtc via HA Add-on Store
@@ -464,18 +460,32 @@ Avoid using `camera.main` / `camera.sub` from the Dahua integration for live das
 3. Add:  
    https://github.com/AlexxIT/hassio-addons
 4. Install **go2rtc** from the list
-5. Start the add-on and optionally enable **"Start on boot"**
+5. Start the add-on and optionally enable **"Start on boot"**, **Watchdog**, and **Show in Sidebar** for easier hopping.
 
 ---
 
 ### 🔎 6.3 Discovering Dahua RTSP Streams (Autodetect via ONVIF)
 
 Once go2rtc is running:
-- Go to **Settings → Integrations → go2rtc**
-- Click **Configure** → it will scan your network for ONVIF-compatible devices
-- Dahua cams or NVR channels should appear as options
-- Select a stream (e.g., `main`, `sub`, or `both`)
-- go2rtc will save these in its internal config
+- Go to **Settings → Addons → go2rtc** and open **Web UI** or just open go2rtc from sidebar
+- Click **Add** → it will open menu with available autodiscovery options, choose ONVIF and it will scan your network for ONVIF-compatible devices
+- Dahua cams or NVR channels should appear as options, like `name: IPs or Hostames` and `url: onvif://user:pass@1[IP or Hostname]`
+- Select a stream url and copy it into the `test` box, replace `user` and `pass` with your Cam's `homeassistant` user credentials, press test
+- After that it will show available livestream URLs, depending on what was configured for your cam (e.g., `stream01` - most likely "main", `stream02`, or `snapshot`)
+- Copy URL you want to add from the right column, already with user and pass replaced, and go to Config tab
+- In Config tab add following lines:
+
+```text
+streams:
+  [Cam name - like New_test_cam]:
+    - [Your URL copied from previous step, like onvif://[user]:[pass]@[IP like 192.168.X.XXX]?subtype=MediaProfile00000]
+  [Next Cam name]
+    - [Next URL]
+etc.
+```
+- Press **Save & Restart**
+  
+go2rtc will save these in its internal config
 
 If autodetection doesn’t work, you can add streams manually.
 
@@ -483,48 +493,90 @@ If autodetection doesn’t work, you can add streams manually.
 
 ### 📝 6.4 Manual Configuration (`go2rtc.yaml`)
 
-Edit `go2rtc.yaml` manually (via File Editor or Terminal):
+Once go2rtc is running:
+- Go to **Settings → Addons → go2rtc** and open **Web UI** or just open go2rtc from sidebar
+- Go to Config tab
+- In Config tab, add the following lines:
+
+```text
+streams:
+  [Cam name - like New_test_cam]:
+    - [Your Dahua Cam Main Stream RTSP URL, available already, ex. rtsp://[user]:@[pass]@[IP]/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif]
+    - [Your Dahua Cam Sub Stream RTSP URL, available already, ex. rtsp://[user]:@[pass]@[IP]/cam/realmonitor?channel=1&subtype=1]
+  [Next Cam name]
+    - [Next Main Stream URL]
+    - [Next Sub Stream URL]
+etc.
+```
+- Press Save & Restart
+
+> 🔐 **Tip:** Don't forget to use a dedicated `homeassistant` user with minimum read permissions and password protect your admin user. If brute force protection or 2FA are availble - use them! CCTV Systems are a popular target for hacking, so avoid casual vulnerabilities and exploits.
+
+---
+
+### ⚠️ 6.5 Explaining go2rtc URLs 
+
+You may have noticed that RTSP URLs are a bit different than what we have looked at in the [4.2 Web-Based Configuration](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#-42-web-based-configuration-) chapter under **Stream Setup (RTSP)** section. And we add two of them under one single camera. Let me explain why we do it this way.
+
+Here’s a full breakdown of what each parameter means:
+
+**🔢 Query Parameters**
+
+| Parameter         | Purpose                                 | Recommendation                           |
+|------------------|------------------------------------------|-------------------------------------------|
+| `channel=1`       | Refers to CAM1 on NVR or standalone cam | Set based on which camera stream you want |
+| `subtype=0`       | Main stream (high quality, high bitrate) | Use for popups or full-screen views       |
+| `subtype=1`       | Sub stream (low-res, low bitrate)        | Use for dashboards or previews            |
+| `unicast=true`    | Forces direct (unicast) stream delivery  | ✅ Always enable for go2rtc and HA         |
+| `proto=Onvif`     | Requests ONVIF-compliant RTSP behavior   | Optional, but improves compatibility      |
+
+`/cam/realmonitor` - This is the standard Dahua RTSP path for **live video streaming**
+
+
+🎯 Why Use Both `subtype=0` and `subtype=1` in go2rtc?
+
+By including **both streams** in your `go2rtc.yaml` entry:
 
 ```yaml
 streams:
-  dahua_front:
-    - rtsp://homeassistant:yourpassword@192.168.1.88:554/cam/realmonitor?channel=1&subtype=1
-  dahua_gate:
-    - rtsp://homeassistant:yourpassword@192.168.1.89:554/cam/realmonitor?channel=2&subtype=1
+  front_yard_cam:
+    - rtsp://...&subtype=0
+    - rtsp://...&subtype=1
 ```
 
-- `channel=1` = CAM1, `subtype=1` = substream (low bitrate, perfect for dashboards)
-- Use `subtype=0` for main stream (high quality, used in recordings or zoomed views)
+You enable **smart fallback and adaptive streaming**:
+- go2rtc will automatically pick the appropriate stream based on the protocol requested:
+  - **MJPEG or low-res view** → `subtype=1`
+  - **WebRTC or full-screen view** → `subtype=0`
+  But I prefer to set up my Dashboards manually - low-res subtype for views where multiple cards with live streams are loaded and hi-res subtypes for pop-up full view of a single camera, as will be explained in [UI Chapter](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#%EF%B8%8F-8-ui-and-dashboards-).
 
-> 🔐 **Tip:** Always use a dedicated `homeassistant` user with minimum read permissions.
+This gives you the **best of both worlds**:
+- Efficient dashboards (fast, lightweight)
+- Sharp popups and detailed views (when needed)
+
+> 🧠 Pro Tip: You can test and compare streams manually in VLC or go2rtc debug UI to see the difference in resolution, latency, and CPU load.
 
 ---
 
 ### 🖼️ 6.5 Adding go2rtc Streams to Home Assistant
 
-Now create Generic Camera entities via YAML or UI.
+Now let's create Generic Camera entities via YAML or UI to use them in our UI cards. HA official cards and custom unofficial UI addons usually require `camera.cam_name` entity.
 
-#### Option A: UI Method
-1. Go to **Settings → Devices & Services → Helpers**
-2. Add **Generic Camera**
-3. For still image and stream source use:
-   http://localhost:1984/api/stream.mjpeg?src=dahua_front  
-   or  
-   rtsp://localhost:8554/dahua_front
+1. Go to **Settings → Devices & Services → Add Integration**
+2. Type **Generic Camera** in search bar
+3. For **stream source URL** use:
+   rtsp://localhost:8554/[Cam name - as set up in go2rtc Config file]
+4. You can ignore **still image URL** or set it up if you have set it up in go2rtc
+5. Leave **RTSP transport protocol** as TCP if you have not changed it
+6. And **Authentication** as Basic, since the link is taken from go2rtc addon, where we did not set up security
+7. Enable **Verify SSL Certificate** so that dashbards accessed via remote connection(if your HA is accessible through your private Domain(ex. Cloudflare tunneling) or Nabu Casa Cloud) would show up without issues
 
-#### Option B: YAML Method (via `configuration.yaml`)
 
-```yaml
-camera:
-  - platform: generic
-    name: Dahua Front
-    still_image_url: http://localhost:1984/api/frame.jpg?src=dahua_front
-    stream_source: rtsp://localhost:8554/dahua_front
-```
-
-> 🧠 You can use go2rtc to consolidate multiple streams, rebroadcast to WebRTC, or create a mixed local/remote setup.
+> 🧠 You can use go2rtc to consolidate multiple streams, rebroadcast to WebRTC, or create a mixed local/remote setup. Check out it's [Github](https://github.com/AlexxIT/go2rtc/) readme and see Streams tab in your go2rtc after you added your cams in go2rtc's Config file - there will be _links_ button in **Commands** column. Open it and there will be many generated(-able)
 
 ---
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ### 🚀 6.6 Performance Tips
 
