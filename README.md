@@ -308,11 +308,104 @@ You can search/filter later by event type
 
 ## 🏠 5. Integrating with Home Assistant [↑](#-table-of-contents)
 
-- Installing the [Dahua Integration](https://www.home-assistant.io/integrations/dahua/)
-- HACS alternatives (if used)
-- Adding cameras or NVR via IP + credentials
-- Channel explanation (CAM1 = channel 1, etc.)
-- Events supported: motion, IVS tripwire, tamper
+## 🏠 5. Integrating with Home Assistant [↑](#-table-of-contents)
+
+Now that your Dahua cameras and NVR are physically installed, configured, and confirmed to be working (ONVIF/RTSP tested, static IPs set, events firing), let’s integrate them into **Home Assistant** to begin automation and dashboard magic.
+
+We’ll be using the **community-made Dahua integration by `@rroller`**, which supports motion detection, IVS events (tripwire, intrusion), tamper sensors, and more. It’s **not part of core HA**, so we install it via **HACS**.
+
+---
+
+### 📦 5.1 Installing Dahua Integration from HACS
+
+You need to have HACS installed (see [HACS documentation](https://hacs.xyz/docs/setup/download)).
+
+🔗 Integration [GitHub Repo](https://github.com/rroller/dahua) - for detailed description, installation guide.
+
+#### 🪜 Step-by-step:
+1. Open HA → **HACS → Integrations → + Explore & Download Repositories**  
+2. Search for **“Dahua”**  
+3. Select **“Dahua NVR/Camera Integration”** by `rroller`  
+4. Click **Download**, then **Restart Home Assistant**
+
+Once that’s done:
+
+5. Go to **Settings → Devices & Services → + Add Integration**  
+6. Search for **Dahua**  
+7. Enter the IP address, ports, channel, and Events(Type) and login of your **NVR** or **camera**. I have added both, but it may be enough to add just IP Cams. 
+   - You can use either HTTP (port 80) or HTTPS (port 443)
+   - RTSP port is 554 by default. Change it if you use a different port
+   - Make sure you select the right Channel(0 if you add single camera and 0,1,2,3,.. if you add cameras through NVR and Cams are assigned different channels in NVR config and NVR Config Channel 1 will be 0 when added, NVR Chanell 2 will be 1 and so on) 
+   - Enter the credentials of the `homeassistant` user you [created earlier](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#-42-web-based-configuration-) in Dahua's Web Interface.
+   - Choose Events checkboxes depending on functions available for your camera, like Face Detection, parking Detection, Crowd or Rioting Detection, Object Placement/Removal, etc.
+   - Once done, the Dahua integration entries will be populated with entities. Once finished, I advice to assign proper names, rooms/areas, and labels to entities for easier navigation.
+
+---
+
+### 🎛️ 5.2 Understanding What Gets Added 
+
+The integration will detect:
+- All available **channels** on your NVR (CAM1, CAM2, ...)
+- All supported **binary sensors** for events
+- Other misc. and config/diagnostic entities
+Such as:
+  - ⚡🚨 `binary_sensor.cross_line_alarm, binary_sensor.cross_region_detection, binary_sensor.motion_alarm, etc.` for tripwire, motion, etc.
+  - 🛑 `camera.main, camera.sub, camera.sub_2, etc.` for stream channels
+  - 🧠 `binary_sensor.smart_motion_human and binary_sensor.smart_motion_vehicle` for smart motion detection events
+
+You can now use these as triggers in automations!
+
+**Quick Example:**
+
+```yaml
+alias: Tripwire trigger for gate alert
+trigger:
+  - platform: state
+    entity_id: binary_sensor.binary_sensor.smart_motion_vehicle_garage_cam
+    to: "on"
+```
+
+---
+
+### 🔁 5.3 Performance Optimization - Replacing Camera Streams with go2rtc addon Links
+
+Each Dahua NVR channel = one camera input.  
+Standalone cameras will usually appear as `channel=1`.
+
+| NVR Channel | HA Entity Example                   | Notes              |
+|-------------|--------------------------------------|---------------------|
+| 1           | `binary_sensor.ivs_tripwire_ch1`     | Front Yard Cam      |
+| 2           | `binary_sensor.motion_detection_ch2` | Backyard Cam        |
+| 3+          | ...                                  | Additional Inputs   |
+
+*Tip: You can rename these entities in HA for clarity.*
+
+---
+
+### 🚫 5.4 Integration Limitations
+
+The current Dahua HACS integration **does not support:**
+- Two-way audio or microphone streaming from HA to Camera(you can try going around it and add 1 or 2-way audio via go2rtc add-on, see go2rtc Configuration section or check out my [Dahua VTO Doorbells Github Repo/Guide](https://github.com/AlexeiakaTechnik/Integration-of-Dahua-VTOs-Doorbells-into-Home-Assistant-and-creating-UI-for-it)).
+- Full PTZ control or presets  
+- Face detection / People counting / Smart tracking  
+- Event push via WebSocket — it's **poll-based**, meaning events may appear with a **1–5s delay**
+
+Despite that, it’s **very stable and reliable**, and more than enough to trigger lights, alarms, notifications, or camera popups.
+
+---
+
+### 🛠️ 5.5 Troubleshooting Tips
+
+- ✅ **Nothing is detected?** Double-check IP, ports, and that ONVIF + motion events are enabled in the camera/NVR.  
+- 🔑 **Wrong credentials?** Try logging in via browser to test the same user/password.  
+- 🔃 **Wrong channel detected?** Re-add the integration using direct camera IP instead of the NVR (or vice versa).  
+- 🧼 **Reset + Retry:** Sometimes it helps to remove the integration, restart HA, and re-add cleanly.
+
+---
+
+This wraps up the **HA-level integration layer**.  
+In the next chapter, we’ll cover how to **embed live RTSP feeds** into your dashboards and optimize them using the `go2rtc` add-on. 
+
 
 ![image](PLACEHOLDER FOR SCREENSHOTS FROM HA-DAHUA INTEGRATION)
 
@@ -320,12 +413,157 @@ You can search/filter later by event type
 
 ## 📡 6. RTSP Streams and go2rtc Configuration [↑](#-table-of-contents)
 
-- What is go2rtc and why use it?
-- Installation via [Home Assistant Add-ons](https://github.com/AlexxIT/go2rtc)
-- Obtaining RTSP URLs from Dahua
-- go2rtc `config.yaml` sample
-- Creating `Generic Camera` entities in HA
-- Mentions of Frigate for advanced use cases
+## 📡 6. RTSP Streams and go2rtc Configuration [↑](#-table-of-contents)
+
+While the Dahua integration brings smart event triggers into Home Assistant, it does **not** handle live video streams.  
+For that, we’ll use **go2rtc** — a powerful, low-latency multiprotocol stream proxy that works perfectly with Dahua's RTSP output.
+
+This chapter covers setting up live video streams inside Home Assistant using Dahua’s RTSP and `go2rtc` add-on.
+
+---
+
+### ⚙️ 6.1 What is go2rtc and Why Use It?
+
+[go2rtc](https://github.com/AlexxIT/go2rtc) is a lightweight stream aggregator that:
+- Accepts RTSP, RTMP, WebRTC, HTTP, UDP, etc.
+- Transcodes or relays streams on demand
+- Supports **camera autodiscovery**, low-latency viewing, and **multi-client support**
+
+In short: it’s the easiest and most efficient way to integrate Dahua live video into HA dashboards.
+
+### 🧠 6.1.1 Why go2rtc Feeds Perform Better Than `camera.main` / `camera.sub`
+
+<details>
+<summary>📼 Explained in detail (Click to Expand)</summary>
+
+------------------------------------
+
+While the Dahua integration automatically exposes RTSP-based entities like `camera.main`, `camera.sub`, and `camera.sub_2`, these often perform worse in dashboards compared to `Generic Camera` entities created manually via **go2rtc**.
+
+Here’s why:
+
+- 🔄 **Dahua camera entities** are routed through **Home Assistant’s internal camera proxy layer**, which:
+  - Adds overhead by trying to "fetch" frames through HA core
+  - May not maintain persistent streaming
+  - Often results in **slow stream startup**, **higher latency**, and **greater CPU/RAM use**
+  - Can stutter or buffer, especially when multiple streams are shown at once
+
+- 🚀 **go2rtc**, by contrast:
+  - Acts as a **dedicated RTSP relay/proxy**, optimized for real-time streaming
+  - **Keeps camera streams active in memory** or reconnects intelligently on demand
+  - **Avoids transcoding** or frame proxying unless explicitly configured
+  - Supports **native MJPEG**, **RTSP**, **WebRTC**, and **HLS** delivery
+  - Integrates directly with custom frontend cards (like [WebRTC Card](https://github.com/AlexxIT/webrtc))
+
+> ✅ **Bottom Line:**  
+> go2rtc reduces latency, avoids HA camera subsystem bottlenecks, and gives you **more control** over performance, compatibility, and stream delivery format.
+
+This is especially noticeable on:
+- Wall-mounted tablets (e.g., Fully Kiosk)
+- Older Android dashboards
+- Mobile views showing 2+ cameras simultaneously
+
+**Best practice:**  
+Avoid using `camera.main` / `camera.sub` from the Dahua integration for live dashboards. Instead, rely on go2rtc-powered `Generic Camera` or `WebRTC` entities for smooth and efficient video streaming.
+
+------------------------------------
+
+</details>
+
+
+
+
+
+---
+
+### 📥 6.2 Installing go2rtc via HA Add-on Store
+
+1. Go to **Settings → Add-ons → Add-on Store**
+2. Click **⋮ → Repositories**
+3. Add:  
+   https://github.com/AlexxIT/hassio-addons
+4. Install **go2rtc** from the list
+5. Start the add-on and optionally enable **"Start on boot"**
+
+---
+
+### 🔎 6.3 Discovering Dahua RTSP Streams (Autodetect via ONVIF)
+
+Once go2rtc is running:
+- Go to **Settings → Integrations → go2rtc**
+- Click **Configure** → it will scan your network for ONVIF-compatible devices
+- Dahua cams or NVR channels should appear as options
+- Select a stream (e.g., `main`, `sub`, or `both`)
+- go2rtc will save these in its internal config
+
+If autodetection doesn’t work, you can add streams manually.
+
+---
+
+### 📝 6.4 Manual Configuration (`go2rtc.yaml`)
+
+Edit `go2rtc.yaml` manually (via File Editor or Terminal):
+
+```yaml
+streams:
+  dahua_front:
+    - rtsp://homeassistant:yourpassword@192.168.1.88:554/cam/realmonitor?channel=1&subtype=1
+  dahua_gate:
+    - rtsp://homeassistant:yourpassword@192.168.1.89:554/cam/realmonitor?channel=2&subtype=1
+```
+
+- `channel=1` = CAM1, `subtype=1` = substream (low bitrate, perfect for dashboards)
+- Use `subtype=0` for main stream (high quality, used in recordings or zoomed views)
+
+> 🔐 **Tip:** Always use a dedicated `homeassistant` user with minimum read permissions.
+
+---
+
+### 🖼️ 6.5 Adding go2rtc Streams to Home Assistant
+
+Now create Generic Camera entities via YAML or UI.
+
+#### Option A: UI Method
+1. Go to **Settings → Devices & Services → Helpers**
+2. Add **Generic Camera**
+3. For still image and stream source use:
+   http://localhost:1984/api/stream.mjpeg?src=dahua_front  
+   or  
+   rtsp://localhost:8554/dahua_front
+
+#### Option B: YAML Method (via `configuration.yaml`)
+
+```yaml
+camera:
+  - platform: generic
+    name: Dahua Front
+    still_image_url: http://localhost:1984/api/frame.jpg?src=dahua_front
+    stream_source: rtsp://localhost:8554/dahua_front
+```
+
+> 🧠 You can use go2rtc to consolidate multiple streams, rebroadcast to WebRTC, or create a mixed local/remote setup.
+
+---
+
+### 🚀 6.6 Performance Tips
+
+- Use **substreams (`subtype=1`)** for dashboards to reduce bandwidth and CPU usage
+- Main streams are better for popups, zoomed-in views, or snapshots
+- go2rtc supports **motion JPEG**, **RTSP**, and **WebRTC** simultaneously — test what works best for your dashboard devices
+- If using older tablets, MJPEG might be the most compatible option
+
+---
+
+### 🧩 6.7 What About Frigate or WebRTC?
+
+- If you need **object detection**, check out [Frigate](https://frigate.video/)
+- If you want **instant loading, no transcoding**, use go2rtc with WebRTC via [AlexxIT's WebRTC card](https://github.com/AlexxIT/webrtc)
+
+We’ll revisit these advanced cases in the **"Further Improvements"** chapter.
+
+---
+
+Now that video feeds are live and integrated, we’re ready to start building **event-driven automations** based on smart triggers from Dahua.
 
 ![image](PLACEHOLDER FOR SCREENSHOTS FROM GO2RTC AND HA CAMERA DASHBOARD)
 
