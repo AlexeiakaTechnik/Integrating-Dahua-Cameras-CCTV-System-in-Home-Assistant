@@ -577,8 +577,6 @@ Now let's create Generic Camera entities via YAML or UI to use them in our UI ca
 
 ---
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 ### 🚀 6.6 Performance Tips
 
 - Use **substreams (`subtype=1`)** for dashboards to reduce bandwidth and CPU usage
@@ -932,13 +930,115 @@ view_layout: ##this is the element from lovelace_layout_card custom UI integrati
 
 ## 🔐 9. Privacy and Security [↑](#-table-of-contents)
 
-- Why not expose NVR ports?  
-- Use of VPN or local-only access  
-- Secure HA: strong passwords, 2FA  
-- UI buttons to disable indoor recording (e.g. bathrooms, pools)  
-- Best practice router setup (VLANs, firewalls)
+In today's digital world, cybersecurity is **non-negotiable**, especially when dealing with surveillance systems. Whether you're a homeowner, business owner, or someone with high public visibility — your CCTV system can either protect you or become your biggest vulnerability. IP cameras and NVRs are among the most **frequent targets of automated hacking bots**, script kiddies, and advanced actors scanning the web 24/7 for exposed systems.
 
-![image](PLACEHOLDER FOR UI SECURITY BUTTONS OR SETTINGS)
+A compromised camera system can mean more than lost footage — it can result in stalkers, blackmail, physical break-ins, or public embarrassment.
+
+This chapter outlines how to **avoid becoming a cautionary tale.**
+
+---
+
+### 🚫 Why You Should NOT Expose NVR or Camera Ports Publicly
+
+Port forwarding your NVR or camera web interfaces (HTTP/HTTPS/RTSP) to the internet is **inherently risky**. If you must do it — take precautions:
+
+#### 🧱 1. Use Firewalls Correctly
+- Restrict incoming connections to only the exact ports you're forwarding
+- Apply firewall rules **on both your router and the NVR/device itself**
+- Only allow known public IPs (e.g. your phone's mobile network range)
+
+#### 🔄 2. Keep Firmware Updated
+- Update camera and NVR firmware regularly to patch critical vulnerabilities
+- Subscribe to Dahua or vendor mailing lists for firmware notices
+
+#### 🔐 3. Strong Authentication
+- Never leave default passwords — **change them immediately**
+- Use strong, unique passwords (12+ characters, random)
+- Enable **2FA/MFA** where available
+
+#### 🕵️ 4. Prefer VPNs Over Port Forwarding
+- Set up OpenVPN, WireGuard, or Zerotier on your home network
+- Or use a VPN-enabled router to restrict remote access only through encrypted tunnels
+- **Never expose port 554 (RTSP) or 37777 (Dahua default) to the open internet**
+
+#### 🧪 5. Monitor and Scan
+- Use tools like `fail2ban`, `Uptime Kuma`, or HA logs to monitor for failed logins
+- Regularly scan your network with tools like Nmap or Nessus
+
+#### 📐 6. Use Network Segmentation
+- Isolate your cameras on a separate VLAN or subnet
+- Block internet access to local-only devices via router rules
+- Only HA or NVR should have full access to them
+
+#### 🔒 7. Close Unused Ports
+- Disable RTSP if not using it
+- Close ONVIF and HTTP ports if not required
+- Change all default service ports to non-standard ones
+
+#### 🛠️ 8. Additional Tips
+- Consider **ngrok**, **Cloudflare Tunnel**, or **Nabu Casa** to access HA securely
+- Use a **dedicated device** for externally accessible services
+- Limit camera info exposure (e.g. no firmware banners or brand IDs)
+
+---
+
+### 🛡️ Secure Your Home Assistant
+
+Home Assistant is often the gateway to your full smart home. A compromised HA instance can lead to:
+- Device takeover
+- Access to recorded clips and camera feeds
+- Triggered automations or remote door/gate unlocks
+
+**Best Practices:**
+- Use **HTTPS** via Nabu Casa or Cloudflare Tunnels
+- Enforce **strong passwords** and 2FA for **all admin users**
+- Create dedicated users with **limited rights** for mobile dashboards or family
+- Enable IP ban after failed login attempts (e.g. `ip_ban_enabled: true` in `configuration.yaml`)
+- Review `home-assistant.log` regularly for suspicious activity
+
+---
+
+### 🧽 Privacy Controls for Guests and Indoor Spaces
+
+Having guests over? Don’t want cameras in private zones?
+
+Add dashboard toggles to:
+- Temporarily disable bathroom/pool/bedroom cameras
+- Mute indoor microphones or IR illuminators
+- Visibly show guests when indoor recording is paused
+
+This isn’t just about ethics or laws — it builds **trust and transparency**.
+
+---
+
+### 📡 Basic Router and Network Best Practices
+
+| Practice              | Description                                                    |
+|-----------------------|----------------------------------------------------------------|
+| VLANs/Subnets         | Segment IoT devices from your main PC/mobile LAN               |
+| Disable UPnP          | Prevent automatic opening of risky ports                       |
+| Set DHCP Reservations | Lock camera IPs to fixed addresses to avoid IP rotation        |
+| Use DNS Blocking      | Stop telemetry calls to unknown vendor cloud addresses         |
+| Log Traffic           | Log incoming and outgoing traffic from critical devices        |
+
+---
+
+### 👁️ Why CCTV Systems Are a Hacker's Dream
+
+Surveillance systems are:
+- **Always on**
+- Often **misconfigured**
+- Commonly run **outdated firmware**
+- Installed with **default passwords**
+- Expose critical real-world info like **floorplans, routines, and people**
+
+That makes them perfect targets for:
+- Harassment and voyeurism
+- Ransom and extortion
+- Botnet inclusion (DDoS armies)
+- Provocation (fake alerts, IR blinding, spotlight trolling)
+
+> ⚠️ The more public your profile or business is, the more you should **treat your cameras like doors and vaults**. Because that’s what they are.
 
 ---
 
@@ -958,11 +1058,116 @@ _Embedded YouTube link showing:_
 
 _Summary of integration pros/cons, reliability, and what worked best._
 
-Possible upgrades:
-- Adding Frigate for object detection  
-- Face recognition with Dlib/Deepstack  
-- Snapshot archival to NAS  
-- Expand to multi-site camera control
+Conclusions: 
+
+Integrating CCTV in Smart Home is good! Having a dozen different APPs is bad! Dahua has potential as well as many other vendors do! A lot of them dont - be sure to research! What else...? Takes time - bad, gives results and may save time in the long run - good! Makes you use your CCTV system you have invested in rather then forget that it's there unless something happens and God forbid you have to share your recordings with the police and notice some of your cams went offline a while ago, but with HA/other smart home integration you will most likely notice something is wrong BEFORE disaster happens. Also try and add something on your own!
+
+Further Improvement:
+
+- Explain what is Frigate NVR, make it clear that it is an extremely power platform, working in its own, can be separated to it's own server/virtual machine, has extensive support, community, etc.
+- Adding Frigate for object detection - add some details on what potential such set-up may have, like automations based on pet monitoring, watching your robots, detection of opened doors/windows without additional sensors, storing extremely detailed recordings with events, objects, filtering and searching using AI, Semantic Search, etc.
+- Outline that powerfull frigate configs do require basically a dedicated PC/mini-PC/server/macine with mid CPU, 16Gb of RAM, dedicated GPU and reliable network - but if invested can provide magic like things to your Smart Home setup
+
+And add that I am personally very much looking forward to get into it as soon as extra time as available(with a joke on it, DIY smart home being an ocd inducing rabbit hole experience but at the same time VERY cool and fruitful hobby/addition to professional job) 
+
+
+
+## 🧩 11. Conclusions and Further Improvement [↑](#-table-of-contents)
+
+Integrating CCTV into a smart home is one of those things that feels like **a hassle at first**… but once done properly, it becomes **indispensable**.
+Gone are the days of a dozen buggy mobile apps with delayed notifications, cloud subscriptions, and forgotten cameras.  
+With Home Assistant, you actually **use the security infrastructure you paid for** — in real-time, with automation, context awareness, and full local control.
+
+---
+
+### ✅ Integration Pros
+
+- Full camera visibility inside your smart home dashboards
+- Motion/IVS/tamper events as automation triggers
+- Can react to activity in real-time (not just review it afterward), especially if notification automations are configured
+- Dahua works well with HA once configured — solid mid-tier gear, but many other vendors doo too! In any case **do research before buying!** Can't stress this enough!
+- Combines well with lights, locks, doorbells, alarms and security systems
+
+### ⚠️ What to Watch Out For
+
+- Initial setup is time-consuming
+- Camera UI and config logic isn’t exactly user-friendly, but the more you do it - the less troubling it gets. And HA community is fantastic with sharing and caring, so you will probably find ready-made solutions!
+- Not all camera models are equal, cheap vendors are cutting corners — again, **research before buying!**
+- Some events/controls (e.g. 2-way audio) may not be accessible in HA easily
+
+That said — the **benefit is huge**:  
+With HA you’ll **notice if something breaks** (camera offline, motion stops), not just when disaster strikes , and, God forbid, you have to hand over footage to Police and notice that some cameras been offline for a whie. With Smart Home integration, you look at your cameras periodically!
+More importantly — you gain a real **sense of control and awareness** over your environment, and can act **before** things escalate.
+
+---
+
+## 🚀 Further Improvements
+
+Once you’ve built your basic integration — the next level is **real AI-powered video analytics**.  
+Let’s talk about **Frigate NVR**.
+
+---
+
+### 🧠 What is Frigate?
+
+[Frigate NVR](https://docs.frigate.video/) is an open-source NVR platform for real-time object detection, optimized for use with Home Assistant.  
+
+It runs independently and can:
+- Record 24/7 or by event
+- Detect humans, pets, cars, bikes, specific objects, maybe even dust gathering on your sofa =)
+- Generate **rich events** and **clips** with bounding boxes
+- Support **license plate reading**, **mask detection**, and more
+- Integrate with **deep learning models** and **semantic search**
+
+> Unlike Dahua's limited smart detection — **Frigate lets you truly know what's going on**, with context and AI-powered insights.
+
+---
+
+### 🐕 What Can You Do With It?
+
+- Turn on lights only when a human is detected (not just motion)
+- Ignore trees and shadows blowing in the wind
+- Notify if your **pet escapes the yard**
+- Detect **robot vacuums** and **cleaning events** and make smart adjustments
+- Fire alerts if a **door or window appears open** visually, without using physical sensors
+- Build automations on **who** or **what** is seen — not just “motion” - Face recognition of impressive quality! 
+- Tag events and search recordings using semantic filters and AI powered categorization
+
+Imagine asking:  
+> “Show me all clips from today where someone entered the garage after 6PM and carried a bag.”
+
+And your Home Assistant with an integrated AI Agent and Frigate opens up a window with such events! This is the true magic-like future of Smart Homes in my opinion, and while commercial platforms are getting into it and cost... well A LOT, with HA, Frigate server and skills/time it's very real for anyone!
+
+---
+
+### 🧰 Hardware Considerations
+
+Frigate is powerful… but it needs horsepower.
+
+To run a serious Frigate setup, you’ll want:
+- A dedicated mini-PC, server, virtual machine, or Docker host 
+- Minimum **16GB RAM**, **SSD storage**, and **reliable LAN** and **mid-range CPU**
+- **GPU (Coral, NVIDIA, Intel VAAPI, etc.)** for real-time detection
+- Cameras with **consistent RTSP streams** (which you already have!)
+
+Once deployed, Frigate can run standalone, or side-by-side with Home Assistant.  
+Many users separate it into its own device or VM for better performance, scalability and reliability.
+
+---
+
+### 👷 My Personal Plans
+
+At the time of writing, I haven’t deployed Frigate yet — but I’m **definitely planning to**.
+
+> Right now my schedule is split between client work, article writing, HA tinkering, and generally getting consumed by the **DIY Smart Home OCD inducing rabbit hole(which I love <3)™**...  
+
+The goal is to eventually add Frigate to my setup with:
+- AI detection
+- Smart recording + snapshots
+- Fully searchable footage
+- And **next-level automations** based on real-world activity
+
+When I do — I will write up it's own GitHub article or die trying, so stay tuned!. 😉
 
 ---
 
@@ -974,8 +1179,13 @@ MIT / CC BY-NC-SA / or your preferred license.
 
 ## 👨‍💻 13. Author and Inspiration [↑](#-table-of-contents)
 
-_Alexei aka Technik_  
+_Alexei Halaim_  
+
 Practical experience integrating security systems into Home Assistant and building dashboards for real clients and personal projects.
+
+Email: alexei.aka.technik@gmail.com
+LinkedIn: [Link](https://www.linkedin.com/in/alexei-halaim-b62326172/)
+Reddit: [Link](https://www.reddit.com/user/Unlikely-Tax-2700/)
 
 ---
 
