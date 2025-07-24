@@ -570,9 +570,10 @@ Now let's create Generic Camera entities via YAML or UI to use them in our UI ca
 5. Leave **RTSP transport protocol** as TCP if you have not changed it
 6. And **Authentication** as Basic, since the link is taken from go2rtc addon, where we did not set up security
 7. Enable **Verify SSL Certificate** so that dashbards accessed via remote connection(if your HA is accessible through your private Domain(ex. Cloudflare tunneling) or Nabu Casa Cloud) would show up without issues
+8. Check new Generic Camera Feed
 
 
-> 🧠 You can use go2rtc to consolidate multiple streams, rebroadcast to WebRTC, or create a mixed local/remote setup. Check out it's [Github](https://github.com/AlexxIT/go2rtc/) readme and see Streams tab in your go2rtc after you added your cams in go2rtc's Config file - there will be _links_ button in **Commands** column. Open it and there will be many generated(-able)
+> 🧠 You can use go2rtc to consolidate multiple streams, rebroadcast to WebRTC, or create a mixed local/remote setup. Check out it's [Github](https://github.com/AlexxIT/go2rtc/) readme and see Streams tab in your go2rtc after you added your cams in go2rtc's Config file - there will be _links_ button in **Commands** column. Open it and there will be many generated or generatable links to different types of output streams you can further use in your HA dashboards.
 
 ---
 
@@ -592,7 +593,7 @@ Now let's create Generic Camera entities via YAML or UI to use them in our UI ca
 - If you need **object detection**, check out [Frigate](https://frigate.video/)
 - If you want **instant loading, no transcoding**, use go2rtc with WebRTC via [AlexxIT's WebRTC card](https://github.com/AlexxIT/webrtc)
 
-We’ll revisit these advanced cases in the **"Further Improvements"** chapter.
+We’ll revisit these advanced cases in the **"Further Improvements"** [chapter](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#-11-conclusions-and-further-improvement-).
 
 ---
 
@@ -604,29 +605,165 @@ Now that video feeds are live and integrated, we’re ready to start building **
 
 ## ⚡ 7. Automations Based on Dahua Provided Events [↑](#-table-of-contents)
 
-- Supported Events: Motion, IVS line crossing, tamper, tripwire
-- Automation ideas:  
-  - Motion triggers lights at night  
-  - Tripwire triggers alarm sound  
-  - Face/tamper triggers snapshot archive
-- Example YAML Automations
+Once your Dahua cameras are integrated into Home Assistant and their smart detection events (IVS, SMD, tamper, etc.) are exposed as `binary_sensor` entities, you can begin automating your home based on real-time surveillance input.
+
+These event-based automations are the heart of a responsive, secure smart home setup — enabling actions like:
+- Turning lights on when someone enters a zone
+- Triggering alarms or snapshots on tripwire detection
+- Muting music or pausing media when someone approaches
+- Logging or notifying when tampering is detected
+
+---
+
+### 🚨 7.1 Types of Events You Can Use
+
+Depending on your camera model and Dahua settings, the integration can expose:
+
+| Event Type           | Binary Sensor Entity Example                         | Use Case Example                              |
+|----------------------|------------------------------------------------------|-----------------------------------------------|
+| Smart Motion (Human) | `binary_sensor.front_gate_camera_smart_motion_human` | Turn on lights, send snapshot                  |
+| IVS Tripwire         | `binary_sensor.driveway_tripwire_crossed`            | Trigger TTS announcement, flash lights        |
+| Tamper Detection     | `binary_sensor.garage_cam_tamper`                    | Send security alert or siren notification     |
+| Audio Detection      | `binary_sensor.livingroom_camera_audio_detected`     | Flash warning light or log event              |
+
+---
+
+### 🧠 7.2 Best Practices for Event Automation
+
+- Combine **multiple triggers** (motion, time, light state) for smarter logic  
+- Use **sun elevation / offset** instead of static time for lighting  
+- Avoid false positives: test IVS zones thoroughly  
+- Always include a manual override (`input_boolean`) for disabling automations
+
+---
+
+### 📄 Let’s take a look at a real-world YAML automation I am using
+
+<details>
+<summary>📄 Example: Smart Motion-Based Courtyard Light Control(Click to Expand)</summary>
 
 ```yaml
-alias: Porch Light On via Tripwire
-trigger:
+alias: Outdoor Light Control via Dahua Smart Motion
+description: "Automatically turns courtyard light ON/OFF based on Dahua camera motion events after sunset"
+triggers:
+  - platform: time_pattern
+    minutes: "/5" ##Lets trigger automation every 5 minutes to check if the lights were left ON
+    id: periodic_check
   - platform: state
-    entity_id: binary_sensor.dahua_tripwire_front
-    to: 'on'
+    entity_id: binary_sensor.courtyard_camera_smart_motion_human ##lets use SmartMotion event as a trigger
+    to: "on"
+    id: motion_detected
+  - platform: state
+    entity_id: binary_sensor.courtyard_camera_smart_motion_human
+    to: "off"
+    id: motion_cleared
 condition:
-  - condition: sun
-    after: sunset
+  - condition: state
+    entity_id: input_boolean.outdoor_light_automation_enabled ##I use helpers to control Automations behavior from UI dashboard
+    state: "on"
 action:
-  - service: light.turn_on
-    target:
-      entity_id: light.porch
+  - choose:
+      - alias: Turn ON Light After Sunset (on Motion)
+        conditions:
+          - condition: sun
+            after: sunset
+            after_offset: "01:00:00" ##I add offset because there is still enough light after sunset in my area
+          - condition: trigger
+            id: motion_detected
+        sequence:
+          - action: light.turn_on
+            target:
+              entity_id: light.courtyard_pool_stairs
+      - alias: Turn OFF Light After Sunset (motion cleared)
+        conditions:
+          - condition: sun
+            after: sunset
+            after_offset: "01:00:00"
+          - condition: trigger
+            id: motion_cleared
+        sequence:
+          - action: light.turn_off
+            target:
+              entity_id: light.courtyard_pool_stairs
+      - alias: Auto-Off After 10min Inactivity ##lets make sure lights turn off in no one is present
+        conditions:
+          - condition: sun
+            after: sunset
+            after_offset: "01:00:00"
+          - condition: trigger
+            id: periodic_check
+          - condition: state
+            entity_id: binary_sensor.courtyard_camera_smart_motion_human
+            state: "off"
+          - condition: device
+            type: is_on
+            entity_id: light.courtyard_pool_stairs
+            for:
+              minutes: 10
+        sequence:
+          - service: light.turn_off
+            target:
+              entity_id: light.courtyard_pool_stairs
+mode: single
 ```
 
+</details>
+
+---
+
+### 🧰 7.3 Optimization Tips
+
+- ✅ **Use `choose:` structure** to branch logic based on trigger type  
+- ☀️ Replace `after_offset` with an `input_datetime` for dynamic tuning  
+- 🧠 Consider `for:` duration on motion trigger instead of relying only on periodic checks  
+- 💡 Use scenes instead of direct `light.turn_on` for more ambiance  
+- 🛑 Include `input_boolean` toggles for override control on the dashboard  
+
+---
+
+### 💡 7.3 Advanced Enhancements & Related Reading
+
+This kind of smart light automation can be further improved by layering in **context-aware conditions** and **manual override mechanisms**.
+
+Here are some powerful enhancements you may want to explore:
+
+- 🔆 **Ambient Light (LUX) Sensors**  
+  Instead of relying solely on sunset, use a calibrated LUX sensor to trigger lighting only when **natural light drops below a specific threshold**.  
+  → Ideal for cloudy days, shaded areas, or indoor/outdoor transitions.
+
+- 🛡️ **Integration with Security Systems**  
+  Link this with your **alarm or security automation** logic:
+  - Flash courtyard lights if alarm is armed and motion is detected
+  - Use visual deterrents as part of intrusion detection or perimeter breach logic
+
+- 🗣️ **Temporary Pause via UI or Voice Assistant**  
+  Add an `input_boolean` like `pause_light_automation` that you can toggle:
+  - From a dashboard switch  
+  - Via Alexa or Google Assistant voice command  
+  - From a wall-mounted tablet  
+  This is great if you want to **manually leave the light on** for a BBQ, chill-out night, or guest evening without motion-triggered cutoffs.
+
+- 🧠 **Other Ideas to Explore**:
+  - 🕒 Limit max ON time (e.g., light auto-turns off after 90 minutes regardless of motion)
+  - 🌗 Use **sun elevation** instead of just `sunset + offset` for smoother seasonal behavior
+  - 🔄 Switch from `time_pattern` to **timer helper + restartable delay** for better performance
+  - 🕹️ Add a `scene` for night-mode lighting vs. full-bright floodlight based on context (e.g., after midnight, use dimmer light)
+
+---
+
+📚 **Want a deeper dive into smart lighting?**
+
+👉 Check out my dedicated article:  
+[💡 My Experience of Improving Light Automations in Home Assistant →](https://github.com/AlexeiakaTechnik/My-experience-of-improving-Light-Automations-in-Home-Assistant)
+
+It includes real-world examples, iterative improvements, and performance insights gathered across multiple Home Assistant deployments.
+
+In the next chapter, we’ll explore how to represent these smart events and video feeds visually using Home Assistant Dashboards, Popups, and Custom Cards.
+
+
 ![image](PLACEHOLDER FOR NODE-RED OR AUTOMATION FLOWCHARTS)
+
+---
 
 ## 🖥️ 8. UI and Dashboards [↑](#-table-of-contents)
 
