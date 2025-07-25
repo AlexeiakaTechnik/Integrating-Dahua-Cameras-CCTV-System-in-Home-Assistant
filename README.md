@@ -2,7 +2,7 @@
 <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/a789fb5c-b4d1-4430-99a1-ca86ca08a189" />
 
 
-# 🎥 Dahua Camera/CCTV System in Home Assistant (🚧UNDER CONSTRUCTION🚧)
+# 🎥 Dahua Camera/CCTV System in Home Assistant
 _Getting Dahua NVRs and cameras into Home Assistant with actionable smart events.  
 Integration walkthrough with go2rtc, smart motion detection, light automations, RTSP streaming setup, and best-practice camera configs._
 
@@ -10,20 +10,20 @@ Integration walkthrough with go2rtc, smart motion detection, light automations, 
 
 ## 📚 Table of Contents
 
-1. [🔍 Introduction](#-1-introduction)  
-2. [🧰 Requirements](#-2-requirements)  
-3. [🧱 Dahua Cameras Overview & Integration Limitations](#-3-dahua-cameras-overview--integration-limitations)  
-4. [🛠️ Cameras Installation Tips and Web-based Setup](#-4-cameras-installation-tips-and-web-based-setup)  
-5. [🏠 Integrating with Home Assistant](#-5-integrating-with-home-assistant)  
-6. [📡 RTSP Streams and go2rtc Configuration](#-6-rtsp-streams-and-go2rtc-configuration)  
-7. [⚡ Automations Based on Dahua Provided Events](#-7-automations-based-on-dahua-provided-events)  
-8. [🖥️ UI and Dashboards](#-8-ui-and-dashboards)  
-9. [🔐 Privacy and Security](#-9-privacy-and-security)  
-10. [🎬 Live Video Demonstration](#-10-live-video-demonstration)  
-11. [🧩 Conclusions and Further Improvement](#-11-conclusions-and-further-improvement)  
-12. [🪪 License](#-12-license)  
-13. [👨‍💻 Author and Inspiration](#-13-author-and-inspiration)  
-14. [🔗 Related Projects & Resources](#-14-related-projects--resources)  
+1. 🔍 [Introduction](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-1-introduction-) 
+2. 🧰 [Requirements](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-2-requirements-)
+3. 🧱 [Dahua Cameras Overview & Integration Limitations](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-3-dahua-cameras-overview--integration-limitations-)
+4. 🛠️ [Cameras Installation Tips and Web-based Setup](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#%EF%B8%8F-4-cameras-installation-tips-and-web-based-setup-)
+5. 🏠 [Integrating with Home Assistant](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-5-integrating-with-home-assistant-)
+6. 📡 [RTSP Streams and go2rtc Configuration](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-6-rtsp-streams-and-go2rtc-configuration-)
+7. ⚡ [Automations Based on Dahua Provided Events](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-7-automations-based-on-dahua-provided-events-)
+8. 🖥️ [UI and Dashboards](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#%EF%B8%8F-8-ui-and-dashboards-)
+9. 🔐 [Privacy and Security](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-9-privacy-and-security-)
+10. 🎬 [Live Video Demonstration](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-10-live-video-demonstration-)  
+11. 🧩 [Conclusions and Further Improvement](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-11-conclusions-and-further-improvement-) 
+12. 🪪 [License](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-12-license-)
+13. 👨‍💻 [Author and Inspiration](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-13-author-and-inspiration-)
+14. 🔗 [Related Projects & Resources](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant#-14-related-projects--resources-)
 
 ---
 
@@ -67,9 +67,9 @@ Before starting the integration, make sure you have the following or equivalent 
 
 ### 💾 Storage & Performance
 - **Sufficient NVR Storage Capacity**  
-  _Depends on: camera resolution, bitrate, retention duration, 2-4Tb is usually enogh_
+  _Depends on: camera resolution, bitrate, retention duration, 2-4Tb is usually enough_
 - **Decent HA hardware**  
-  _Raspberry Pi 4 is a minimal baseline. More cams = better CPU and storage. Also dashboard tablets/phones should have decent performance to quickly load multiple streams_
+  _Raspberry Pi 4 is a minimal baseline. More cams = better CPU and storage. Also, dashboard tablets/phones should have decent performance to quickly load multiple streams_
 
 ---
 
@@ -217,7 +217,7 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
 
 
 - **User Management:** [↑](#-table-of-contents)
-  Create a dedicated `homeassistant` user with only the needed permissions(live is enough). Avoid using admin credentials for automation integrations. Make sure to write down username and password - those are used to access RTSP link.
+  Create a dedicated `homeassistant` user with only the needed permissions(live is enough). Avoid using admin credentials for automation integrations. Make sure to write down the username and password - those are used to access the RTSP link.
   Example:
 
   <details>
@@ -254,13 +254,13 @@ Each Dahua camera has a built-in web UI, accessible via IP address. This is wher
 
         <img width="1304" height="569" alt="image" src="https://github.com/user-attachments/assets/e88c948d-c23f-4dea-b4ef-50653793e4ec" />
         <img width="1781" height="880" alt="image" src="https://github.com/user-attachments/assets/474bcfed-3f6d-4326-9ba0-b665c1653b35" /> </details>
-    - **Abnormality Detection** - uses system/device monitoring as Event triggers. Can be Brute force login attempts, Network or Power outages, IP conflicts, offline Storage, or even camera lid/casing opening events. I have Network disconnect, unsuccessful logins, and power events used as triggers. <details>
+    - **Abnormality Detection** - uses system/device monitoring as Event triggers. Can be Brute force login attempts, Network or Power outages, IP conflicts, offline Storage, or even camera lid/casing opening events. I have Network disconnects, unsuccessful logins, and power events used as triggers. <details>
                                                                                                                                                                       <summary>📸 Smart Plan & IVS Tabs (Click to                                                                                                                                                                                     Expand)</summary>
 
         <img width="1357" height="406" alt="image" src="https://github.com/user-attachments/assets/d71e27da-34ab-4d61-9818-467c6b544347" /> </details>
 
 
-One more **important thing regarding events** - you may have a question about "overlapping events", like - "what if we have all of those enabled simultaneously, and a screaming person runs in our camera's frame? Is there going to be a dozen similar recordings cluttering up our storage?" The short answer is - No. For a longer explanation, I have researched it for you! Additional read under spoiler:
+One more **important thing regarding events** - you may have a question about "overlapping events", like - "what if we have all of those enabled simultaneously, and a screaming person runs into our camera's frame? Is there going to be a dozen similar recordings cluttering up our storage?" The short answer is - No. For a longer explanation, I have researched it for you! Additional read under spoiler:
 
 <details>
 <summary>📼 TL;DR – What happens if multiple events are triggered at once? (Click to Expand)</summary>
@@ -410,7 +410,7 @@ This chapter covers setting up live video streams inside Home Assistant using Da
 - Transcodes or relays streams on demand
 - Supports **camera autodiscovery**, low-latency viewing, and **multi-client support**
 
-In short: it’s the easiest and most efficient way to integrate Dahua live video into HA dashboards.
+In short, it’s the easiest and most efficient way to integrate Dahua live video into HA dashboards.
 
 ### 🧠 6.1.1 Why go2rtc Feeds Perform Better Than `camera.main` / `camera.sub`
 
@@ -468,12 +468,12 @@ Avoid using `camera.main` / `camera.sub` from the Dahua integration for live das
 
 Once go2rtc is running:
 - Go to **Settings → Addons → go2rtc** and open **Web UI** or just open go2rtc from sidebar
-- Click **Add** → it will open menu with available autodiscovery options, choose ONVIF and it will scan your network for ONVIF-compatible devices
+- Click **Add** → it will open a menu with available autodiscovery options, choose ONVIF, and it will scan your network for ONVIF-compatible devices
 - Dahua cams or NVR channels should appear as options, like `name: IPs or Hostames` and `url: onvif://user:pass@1[IP or Hostname]`
-- Select a stream url and copy it into the `test` box, replace `user` and `pass` with your Cam's `homeassistant` user credentials, press test
-- After that it will show available livestream URLs, depending on what was configured for your cam (e.g., `stream01` - most likely "main", `stream02`, or `snapshot`)
-- Copy URL you want to add from the right column, already with user and pass replaced, and go to Config tab
-- In Config tab add following lines:
+- Select a stream URL and copy it into the `test` box, replace `user` and `pass` with your Cam's `homeassistant` user credentials, and press test
+- After that, it will show available livestream URLs, depending on what was configured for your cam (e.g., `stream01` - most likely "main", `stream02`, or `snapshot`)
+- Copy the URL you want to add from the right column, already with user and pass replaced, and go to the Config tab
+- In the Config tab, add the  following lines:
 
 ```text
 streams:
@@ -645,7 +645,7 @@ alias: Outdoor Light Control via Dahua Smart Motion
 description: "Automatically turns courtyard light ON/OFF based on Dahua camera motion events after sunset"
 triggers:
   - platform: time_pattern
-    minutes: "/5" ##Lets trigger automation every 5 minutes to check if the lights were left ON
+    minutes: "/5" ## Let's trigger automation every 5 minutes to check if the lights were left ON
     id: periodic_check
   - platform: state
     entity_id: binary_sensor.courtyard_camera_smart_motion_human ##lets use SmartMotion event as a trigger
@@ -657,7 +657,7 @@ triggers:
     id: motion_cleared
 condition:
   - condition: state
-    entity_id: input_boolean.outdoor_light_automation_enabled ##I use helpers to control Automations behavior from UI dashboard
+    entity_id: input_boolean.outdoor_light_automation_enabled ##I use helpers to control automation's behavior from UI dashboard
     state: "on"
 action:
   - choose:
@@ -731,7 +731,7 @@ Here are some powerful enhancements you may want to explore:
 
 - 🛡️ **Integration with Security Systems**  
   Link this with your **alarm or security automation** logic:
-  - Flash courtyard lights if alarm is armed and motion is detected
+  - Flash courtyard lights if the alarm is armed and motion is detected
   - Use visual deterrents as part of intrusion detection or perimeter breach logic
 
 - 🗣️ **Temporary Pause via UI or Voice Assistant**  
@@ -802,7 +802,7 @@ Please carefully read ##comments!
 ```yaml
 type: custom:stack-in-card
 title: Entrance Level 1
-card_mod: ##this is a styling section to beautify card
+card_mod: ##this is a styling section to beautify the card
   style: |
     ha-card {
       border-style: solid;
@@ -820,31 +820,31 @@ mode: vertical
 cards:
   - camera_view: live
     type: picture-glance
-    entities:  ##here we add togglable entities to quick glance view
+    entities:  ##here we add togglable entities to a quick glance view
       - entity: switch.gate_relay
       - entity: lock.door_front
       - entity: light.entryway_cam_spotlight
       - entity: light.entryway_cam_ir_light
       - entity: light.courtyard_lamp_posts
       - entity: light.courtyard_door_spotlight
-    camera_image: camera.1_level_front_entrance_camera ##this is our Generic Camera entity we created in [chapter 6.5](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#%EF%B8%8F-65-adding-go2rtc-streams-to-home-assistant)
-    entity: automation.main_hall_tv_turn_on_off_automation ##just a placeholder entity - choose any available that doesnt change states much
+    camera_image: camera.1_level_front_entrance_camera ##this is our Generic Camera entity we created in [chapter 6.5]
+    entity: automation.main_hall_tv_turn_on_off_automation ##just a placeholder entity - choose any available that doesn't change states much
     hold_action: ##open larger view on hold action
       action: navigate
       navigation_path: >-
-        https://YOUR_REMOTE_HA_DONAIN_ADDRESS/api/hassio_ingress/GO2RTC_ID/webrtc.html?src=1st_Level_Entrance_Cam&media=video+audio ##THIS IS IMPORTANT - for the stream to be available remotely we use **link generated by go2rtc** addon, as mentioned in [🖼️ 6.5 Adding go2rtc Streams to Home Assistant chapter](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#%EF%B8%8F-65-adding-go2rtc-streams-to-home-assistant), particularly **webrtc.html local WebRTC viewer** link at the bottom of the page
+        https://YOUR_REMOTE_HA_DONAIN_ADDRESS/api/hassio_ingress/GO2RTC_ID/webrtc.html?src=1st_Level_Entrance_Cam&media=video+audio ##THIS IS IMPORTANT - for the stream to be available remotely, we use **link generated by go2rtc** addon, as mentioned in [🖼️ 6.5 Adding go2rtc Streams to Home Assistant chapter], particularly **webrtc.html local WebRTC viewer** link at the bottom of the page
     tap_action:
-      action: fire-dom-event ##here we add browsermod functionality to open pop-ups on the device which currently displays dashboard
+      action: fire-dom-event ##here we add browsermod functionality to open pop-ups on the device that currently displays the dashboard
       browser_mod:
         service: browser_mod.popup
         data:
           title: 1st Level Entrance
-          timeout: 600000 ##set a timeout for how long popup lasts
+          timeout: 600000 ##set a timeout for how long the popup lasts
           content:
             type: picture-elements
-            camera_image: camera.1_level_front_entrance_camera_hd ##this is our Generic Camera entity we created in [chapter 6.5](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant?tab=readme-ov-file#%EF%B8%8F-65-adding-go2rtc-streams-to-home-assistant), but with a Higher Resolution from Main Dahua RTSP Stream
+            camera_image: camera.1_level_front_entrance_camera_hd ##this is our Generic Camera entity we created in [chapter 6.5], but with a Higher Resolution than the Main Dahua RTSP Stream
             camera_view: live
-            elements: ##here we add togglable entities to popup view, note that we use style: to adjust their position and scale on live view
+            elements: ##here we add toggleable entities to the popup view, note that we use style: to adjust their position and scale on live view
               - type: state-icon
                 icon: mdi:spotlight
                 style:
@@ -900,7 +900,7 @@ cards:
                   action: toggle
                 entity: light.courtyard_lamp_posts
 columns: 1
-view_layout: ##this is the element from lovelace_layout_card custom UI integration from HACS, I use them to position cards in grid with coordinates, [Link](https://github.com/thomasloven/lovelace-layout-card)
+view_layout: ##this is the element from lovelace_layout_card custom UI integration from HACS, I use them to position cards in grid with coordinates
   grid-area: c4
 
 ```
@@ -912,10 +912,10 @@ view_layout: ##this is the element from lovelace_layout_card custom UI integrati
 ### 💡 Tips for Better Camera Dashboards
 
 - 🖼️ Use `picture-elements` inside popups for **precise button placement**
-- 🔁 Combine with `conditional` cards to **hide controls when not needed or when situatonal context requires them**
+- 🔁 Combine with `conditional` cards to **hide controls when not needed or when situational context requires them**
 - 📱 Works great on **wall tablets** using Fully Kiosk Browser
 - 🎨 Style with `card_mod` to differentiate security panels visually
-- 🔊 Add `media_player` buttons to doorbell popups for announcements or TTS, especially cool if your doorbell can be used as media_player entity in HA or you have a speaker/tablet/other player nearby
+- 🔊 Add `media_player` buttons to doorbell popups for announcements or TTS, especially cool if your doorbell can be used as a media_player entity in HA or you have a speaker/tablet/other player nearby
 
 ---
 
@@ -945,7 +945,7 @@ Port forwarding your NVR or camera web interfaces (HTTP/HTTPS/RTSP) to the inter
 #### 🧱 1. Use Firewalls Correctly
 - Restrict incoming connections to only the exact ports you're forwarding
 - Apply firewall rules **on both your router and the NVR/device itself**
-- Only allow known public IPs (e.g. your phone's mobile network range)
+- Only allow known public IPs (e.g., your phone's mobile network range)
 
 #### 🔄 2. Keep Firmware Updated
 - Update camera and NVR firmware regularly to patch critical vulnerabilities
@@ -978,7 +978,7 @@ Port forwarding your NVR or camera web interfaces (HTTP/HTTPS/RTSP) to the inter
 #### 🛠️ 8. Additional Tips
 - Consider **ngrok**, **Cloudflare Tunnel**, or **Nabu Casa** to access HA securely
 - Use a **dedicated device** for externally accessible services
-- Limit camera info exposure (e.g. no firmware banners or brand IDs)
+- Limit camera info exposure (e.g., no firmware banners or brand IDs)
 
 ---
 
@@ -1056,24 +1056,6 @@ _Embedded YouTube link showing:_
 
 ## 🧩 11. Conclusions and Further Improvement [↑](#-table-of-contents)
 
-_Summary of integration pros/cons, reliability, and what worked best._
-
-Conclusions: 
-
-Integrating CCTV in Smart Home is good! Having a dozen different APPs is bad! Dahua has potential as well as many other vendors do! A lot of them dont - be sure to research! What else...? Takes time - bad, gives results and may save time in the long run - good! Makes you use your CCTV system you have invested in rather then forget that it's there unless something happens and God forbid you have to share your recordings with the police and notice some of your cams went offline a while ago, but with HA/other smart home integration you will most likely notice something is wrong BEFORE disaster happens. Also try and add something on your own!
-
-Further Improvement:
-
-- Explain what is Frigate NVR, make it clear that it is an extremely power platform, working in its own, can be separated to it's own server/virtual machine, has extensive support, community, etc.
-- Adding Frigate for object detection - add some details on what potential such set-up may have, like automations based on pet monitoring, watching your robots, detection of opened doors/windows without additional sensors, storing extremely detailed recordings with events, objects, filtering and searching using AI, Semantic Search, etc.
-- Outline that powerfull frigate configs do require basically a dedicated PC/mini-PC/server/macine with mid CPU, 16Gb of RAM, dedicated GPU and reliable network - but if invested can provide magic like things to your Smart Home setup
-
-And add that I am personally very much looking forward to get into it as soon as extra time as available(with a joke on it, DIY smart home being an ocd inducing rabbit hole experience but at the same time VERY cool and fruitful hobby/addition to professional job) 
-
-
-
-## 🧩 11. Conclusions and Further Improvement [↑](#-table-of-contents)
-
 Integrating CCTV into a smart home is one of those things that feels like **a hassle at first**… but once done properly, it becomes **indispensable**.
 Gone are the days of a dozen buggy mobile apps with delayed notifications, cloud subscriptions, and forgotten cameras.  
 With Home Assistant, you actually **use the security infrastructure you paid for** — in real-time, with automation, context awareness, and full local control.
@@ -1085,18 +1067,18 @@ With Home Assistant, you actually **use the security infrastructure you paid for
 - Full camera visibility inside your smart home dashboards
 - Motion/IVS/tamper events as automation triggers
 - Can react to activity in real-time (not just review it afterward), especially if notification automations are configured
-- Dahua works well with HA once configured — solid mid-tier gear, but many other vendors doo too! In any case **do research before buying!** Can't stress this enough!
-- Combines well with lights, locks, doorbells, alarms and security systems
+- Dahua works well with HA once configured — solid mid-tier gear, but many other vendors do too! In any case **do research before buying!** Can't stress this enough!
+- Combines well with lights, locks, doorbells, alarms, and security systems
 
 ### ⚠️ What to Watch Out For
 
 - Initial setup is time-consuming
 - Camera UI and config logic isn’t exactly user-friendly, but the more you do it - the less troubling it gets. And HA community is fantastic with sharing and caring, so you will probably find ready-made solutions!
 - Not all camera models are equal, cheap vendors are cutting corners — again, **research before buying!**
-- Some events/controls (e.g. 2-way audio) may not be accessible in HA easily
+- Some events/controls (e.g., 2-way audio) may not be accessible in HA easily
 
 That said — the **benefit is huge**:  
-With HA you’ll **notice if something breaks** (camera offline, motion stops), not just when disaster strikes , and, God forbid, you have to hand over footage to Police and notice that some cameras been offline for a whie. With Smart Home integration, you look at your cameras periodically!
+With HA you’ll **notice if something breaks** (camera offline, motion stops), not just when disaster strikes, and, God forbid, you have to hand over footage to the Police and notice that some cameras have been offline for a whie. With Smart Home integration, you look at your cameras periodically!
 More importantly — you gain a real **sense of control and awareness** over your environment, and can act **before** things escalate.
 
 ---
@@ -1173,7 +1155,7 @@ When I do — I will write up it's own GitHub article or die trying, so stay tun
 
 ## 🪪 12. License [↑](#-table-of-contents)
 
-MIT / CC BY-NC-SA / or your preferred license.
+This project is licensed under the [MIT License](https://github.com/AlexeiakaTechnik/Integrating-Dahua-Cameras-CCTV-System-in-Home-Assistant/blob/main/LICENSE).
 
 ---
 
@@ -1181,7 +1163,8 @@ MIT / CC BY-NC-SA / or your preferred license.
 
 _Alexei Halaim_  
 
-Practical experience integrating security systems into Home Assistant and building dashboards for real clients and personal projects.
+Smart Home Professional, Integrator, Home Assistant enthusiast.
+Practical experience integrating security systems and video surveillance into Home Assistant and building dashboards for real clients and personal projects.
 
 Email: alexei.aka.technik@gmail.com
 LinkedIn: [Link](https://www.linkedin.com/in/alexei-halaim-b62326172/)
