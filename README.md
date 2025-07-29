@@ -615,7 +615,7 @@ Now let's create Generic Camera entities via YAML or UI to use them in our UI ca
 <details>
 <summary>📸 go2rtc links (Click to Expand)</summary>
 
-<img width="1338" height="854" alt="image" src="https://github.com/user-attachments/assets/f9adced7-aa2f-4207-b460-e7a53bf0b729" />
+<img width="1262" height="370" alt="image" src="https://github.com/user-attachments/assets/23b8b47c-3821-40e7-948f-be6f3f7230c6" />
 
 </details>
 
@@ -949,6 +949,15 @@ view_layout: ##this is the element from lovelace_layout_card custom UI integrati
 
 </details>
 
+**This is what a pop-up may look like:**
+
+<details>
+<summary>📸 Cam Live Stream View in HA (Click to Expand)</summary>
+
+<img width="1240" height="839" alt="image" src="https://github.com/user-attachments/assets/32f0ea16-c498-426f-82f8-8e5575cbcf9c" />
+
+
+</details>
 ---
 
 ### 💡 Tips for Better Camera Dashboards
@@ -964,9 +973,6 @@ view_layout: ##this is the element from lovelace_layout_card custom UI integrati
 📚 **Want more on dashboard design for tablets and phones?**  
 👉 See my article:  
 [📱 Practical and Stylish Home Assistant Dashboards for Tablets & Phones →](https://github.com/AlexeiakaTechnik/Practial-and-stylish-Home-Assistant-Dashboards-for-Tablets-and-Mobile-Phones)
-
-
-![image](PLACEHOLDER FOR DASHBOARD AND POPUP UI)
 
 ---
 
@@ -1035,7 +1041,7 @@ Home Assistant is often the gateway to your full smart home. A compromised HA in
 - Use **HTTPS** via Nabu Casa or Cloudflare Tunnels
 - Enforce **strong passwords** and 2FA for **all admin users**
 - Create dedicated users with **limited rights** for mobile dashboards or family
-- Enable IP ban after failed login attempts (e.g. `ip_ban_enabled: true` in `configuration.yaml`)
+- Enable IP ban after failed login attempts (e.g., `ip_ban_enabled: true` in `configuration.yaml`)
 - Review `home-assistant.log` regularly for suspicious activity
 
 ---
@@ -1088,13 +1094,7 @@ That makes them perfect targets for:
 
 _Youtube short showing live demonstration of courtyard lights turned on by Smart Motion Human event received from Dahua IP Camera:_
 
-[![HA - AJAX Demonstration](https://img.youtube.com/vi/Y7OIOnYIf7U/0.jpg)](https://www.youtube.com/watch?v=Y7OIOnYIf7U)
-
-
-
-https://youtube.com/shorts/dvUbkzdRE_4?si=THXLblPRah-TTeUL
-
-![image](PLACEHOLDER FOR YOUTUBE THUMBNAIL)
+[![HA - Dahua - Automation Demo](https://img.youtube.com/vi/W4evMrAUYnw/0.jpg)](https://www.youtube.com/watch?v=W4evMrAUYnw)
 
 ---
 
@@ -1135,6 +1135,8 @@ Let’s talk about **Frigate NVR**.
 ---
 
 ### 🧠 What is Frigate?
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/06831f41-d6fa-4cbc-a1e8-fe4a5731801a" />
 
 [Frigate NVR](https://docs.frigate.video/) is an open-source NVR platform for real-time object detection, optimized for use with Home Assistant.  
 
