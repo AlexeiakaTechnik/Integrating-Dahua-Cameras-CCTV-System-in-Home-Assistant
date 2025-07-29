@@ -1,0 +1,62 @@
+alias: Outdoor Light Control via Dahua Smart Motion
+description: "Automatically turns courtyard light ON/OFF based on Dahua camera motion events after sunset"
+triggers:
+  - platform: time_pattern
+    minutes: "/5" ## Let's trigger automation every 5 minutes to check if the lights were left ON
+    id: periodic_check
+  - platform: state
+    entity_id: binary_sensor.courtyard_camera_smart_motion_human ##lets use SmartMotion event as a trigger
+    to: "on"
+    id: motion_detected
+  - platform: state
+    entity_id: binary_sensor.courtyard_camera_smart_motion_human
+    to: "off"
+    id: motion_cleared
+condition:
+  - condition: state
+    entity_id: input_boolean.outdoor_light_automation_enabled ##I use helpers to control automation's behavior from UI dashboard
+    state: "on"
+action:
+  - choose:
+      - alias: Turn ON Light After Sunset (on Motion)
+        conditions:
+          - condition: sun
+            after: sunset
+            after_offset: "01:00:00" ##I add offset because there is still enough light after sunset in my area
+          - condition: trigger
+            id: motion_detected
+        sequence:
+          - action: light.turn_on
+            target:
+              entity_id: light.courtyard_pool_stairs
+      - alias: Turn OFF Light After Sunset (motion cleared)
+        conditions:
+          - condition: sun
+            after: sunset
+            after_offset: "01:00:00"
+          - condition: trigger
+            id: motion_cleared
+        sequence:
+          - action: light.turn_off
+            target:
+              entity_id: light.courtyard_pool_stairs
+      - alias: Auto-Off After 10min Inactivity ##lets make sure lights turn off in no one is present
+        conditions:
+          - condition: sun
+            after: sunset
+            after_offset: "01:00:00"
+          - condition: trigger
+            id: periodic_check
+          - condition: state
+            entity_id: binary_sensor.courtyard_camera_smart_motion_human
+            state: "off"
+          - condition: device
+            type: is_on
+            entity_id: light.courtyard_pool_stairs
+            for:
+              minutes: 10
+        sequence:
+          - service: light.turn_off
+            target:
+              entity_id: light.courtyard_pool_stairs
+mode: single
