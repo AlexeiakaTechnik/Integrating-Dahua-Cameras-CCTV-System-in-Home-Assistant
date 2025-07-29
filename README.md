@@ -338,6 +338,13 @@ Once that’s done:
    - Choose Events checkboxes depending on functions available for your camera, like Face Detection, parking Detection, Crowd or Rioting Detection, Object Placement/Removal, etc.
    - Once done, the Dahua integration entries will be populated with entities. When finished, I advise assigning proper names, rooms/areas, and labels to entities for easier navigation and management.
 
+<details>
+<summary>📸 Dahua Integration in HA (Click to Expand)</summary>
+
+<img width="1444" height="864" alt="image" src="https://github.com/user-attachments/assets/40972427-6a45-4717-a5a2-9ae59c0f0b84" />
+
+</details>
+
 ---
 
 ### 🎛️ 5.2 Understanding What Gets Added 
@@ -350,6 +357,13 @@ Such as:
   - ⚡🚨 `binary_sensor.cross_line_alarm, binary_sensor.cross_region_detection, binary_sensor.motion_alarm, etc.` for tripwire, motion detection events, etc.
   - 🛑 `camera.main, camera.sub, camera.sub_2, etc.` for stream channels
   - 🧠 `binary_sensor.smart_motion_human and binary_sensor.smart_motion_vehicle` for smart motion detection events
+
+<details>
+<summary>📸 Dahua Cam Entry (Click to Expand)</summary>
+
+<img width="1442" height="884" alt="image" src="https://github.com/user-attachments/assets/8ec31438-8b5d-4319-b123-df317d53a598" />
+
+</details>
 
 You can now use these as triggers in automations!
 
@@ -390,8 +404,6 @@ This wraps up the **HA-level integration layer**.
 In the next chapter, we’ll cover how to **embed live RTSP feeds** into your dashboards and optimize them using the `go2rtc` add-on. 
 
 
-![image](PLACEHOLDER FOR SCREENSHOTS FROM HA-DAHUA INTEGRATION)
-
 ---
 
 ## 📡 6. RTSP Streams and go2rtc Configuration [↑](#-table-of-contents)
@@ -411,6 +423,9 @@ This chapter covers setting up live video streams inside Home Assistant using Da
 - Supports **camera autodiscovery**, low-latency viewing, and **multi-client support**
 
 In short, it’s the easiest and most efficient way to integrate Dahua live video into HA dashboards.
+
+<img width="2560" height="1280" alt="image" src="https://github.com/user-attachments/assets/4b2599d8-4752-4b69-80cb-a3cb4d1f9979" />
+
 
 ### 🧠 6.1.1 Why go2rtc Feeds Perform Better Than `camera.main` / `camera.sub`
 
@@ -489,6 +504,15 @@ go2rtc will save these in its internal config
 
 If autodetection doesn’t work, you can add streams manually.
 
+<details>
+<summary>📸 Screenshots from go2rtc (Click to Expand)</summary>
+
+<img width="1915" height="720" alt="image" src="https://github.com/user-attachments/assets/8309297b-d8ec-459f-804b-198e2873503a" />
+<img width="1105" height="781" alt="image" src="https://github.com/user-attachments/assets/568681a8-7464-4254-a45e-5832935c228e" />
+
+
+</details>
+
 ---
 
 ### 📝 6.4 Manual Configuration (`go2rtc.yaml`)
@@ -512,6 +536,13 @@ etc.
 
 > 🔐 **Tip:** Don't forget to use a dedicated `homeassistant` user with minimum read permissions and password protect your admin user. If brute force protection or 2FA are availble - use them! CCTV Systems are a popular target for hacking, so avoid casual vulnerabilities and exploits.
 
+
+<details>
+<summary>📸 go2rtc config tab (Click to Expand)</summary>
+
+<img width="1338" height="854" alt="image" src="https://github.com/user-attachments/assets/b98fc7d8-5d08-4515-b809-451d84020c77" />
+
+</details>
 ---
 
 ### ⚠️ 6.5 Explaining go2rtc URLs 
@@ -572,8 +603,21 @@ Now let's create Generic Camera entities via YAML or UI to use them in our UI ca
 7. Enable **Verify SSL Certificate** so that dashbards accessed via remote connection(if your HA is accessible through your private Domain(ex. Cloudflare tunneling) or Nabu Casa Cloud) would show up without issues
 8. Check new Generic Camera Feed
 
+<details>
+<summary>📸 Adding Generic Camera (Click to Expand)</summary>
+
+<img width="1435" height="875" alt="image" src="https://github.com/user-attachments/assets/2eef4a64-7e92-4b93-a7b3-b58ab6065015" />
+
+</details>
 
 > 🧠 You can use go2rtc to consolidate multiple streams, rebroadcast to WebRTC, or create a mixed local/remote setup. Check out it's [Github](https://github.com/AlexxIT/go2rtc/) readme and see Streams tab in your go2rtc after you added your cams in go2rtc's Config file - there will be _links_ button in **Commands** column. Open it and there will be many generated or generatable links to different types of output streams you can further use in your HA dashboards.
+
+<details>
+<summary>📸 go2rtc links (Click to Expand)</summary>
+
+<img width="1338" height="854" alt="image" src="https://github.com/user-attachments/assets/f9adced7-aa2f-4207-b460-e7a53bf0b729" />
+
+</details>
 
 ---
 
@@ -597,7 +641,6 @@ We’ll revisit these advanced cases in the **"Further Improvements"** [chapter]
 
 Now that video feeds are live and integrated, we’re ready to start building **event-driven automations** based on smart triggers from Dahua.
 
-![image](PLACEHOLDER FOR SCREENSHOTS FROM GO2RTC AND HA CAMERA DASHBOARD)
 
 ---
 
@@ -758,12 +801,11 @@ It includes real-world examples, iterative improvements, and performance insight
 
 In the next chapter, we’ll explore how to represent these smart events and video feeds visually using Home Assistant Dashboards, Popups, and Custom Cards.
 
-
-![image](PLACEHOLDER FOR NODE-RED OR AUTOMATION FLOWCHARTS)
-
 ---
 
 ## 🖥️ 8. UI and Dashboards [↑](#-table-of-contents)
+
+<img width="1583" height="1058" alt="image" src="https://github.com/user-attachments/assets/eaf3990f-7ab7-444f-ab82-c882e565fdb6" />
 
 Once your streams and event triggers are functional, the next step is building an intuitive and fast UI for daily interaction.
 
@@ -1044,11 +1086,13 @@ That makes them perfect targets for:
 
 ## 🎬 10. Live Video Demonstration [↑](#-table-of-contents)
 
-_Embedded YouTube link showing:_
-- Overview of physical setup  
-- Live camera feeds on wall-mounted tablet  
-- Example: night detection triggers lights  
-- Example: tripwire triggers alert & popup
+_Youtube short showing live demonstration of courtyard lights turned on by Smart Motion Human event received from Dahua IP Camera:_
+
+[![HA - AJAX Demonstration](https://img.youtube.com/vi/Y7OIOnYIf7U/0.jpg)](https://www.youtube.com/watch?v=Y7OIOnYIf7U)
+
+
+
+https://youtube.com/shorts/dvUbkzdRE_4?si=THXLblPRah-TTeUL
 
 ![image](PLACEHOLDER FOR YOUTUBE THUMBNAIL)
 
