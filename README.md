@@ -540,7 +540,7 @@ etc.
 <details>
 <summary>📸 go2rtc config tab (Click to Expand)</summary>
 
-<img width="1338" height="854" alt="image" src="https://github.com/user-attachments/assets/b98fc7d8-5d08-4515-b809-451d84020c77" />
+<img width="1262" height="370" alt="image" src="https://github.com/user-attachments/assets/23b8b47c-3821-40e7-948f-be6f3f7230c6" />
 
 </details>
 ---
@@ -615,7 +615,7 @@ Now let's create Generic Camera entities via YAML or UI to use them in our UI ca
 <details>
 <summary>📸 go2rtc links (Click to Expand)</summary>
 
-<img width="1262" height="370" alt="image" src="https://github.com/user-attachments/assets/23b8b47c-3821-40e7-948f-be6f3f7230c6" />
+<img width="1263" height="882" alt="image" src="https://github.com/user-attachments/assets/7e64b7a8-fc19-4bed-bc26-7c884645f32f" />
 
 </details>
 
